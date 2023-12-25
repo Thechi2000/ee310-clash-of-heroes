@@ -1,0 +1,38 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Make",
+      "type": "shell",
+      "command": "make",
+      "args": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Desmume: Run",
+      "type": "shell",
+      "command": "unset GTK_PATH && ${config:desmume} ${config:nds_file}",
+      "isBackground": true,
+      "dependsOn": [
+        "Make"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Desmume: Start debug",
+      "type": "shell",
+      "command": "unset GTK_PATH && setsid ${config:desmume} ${config:nds_file} --arm9gdb ${config:gdb_port}",
+      "dependsOn": [
+        "Make"
+      ]
+    },
+    {
+      "label": "Desmume: Stop debug",
+      "type": "shell",
+      "command": "pkill -9 -f 'arm9gdb ${config:gdb_port}'"
+    }
+  ]
+}

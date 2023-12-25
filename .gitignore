@@ -1,0 +1,6 @@
+build/
+**/*.arm9
+**/*.elf
+**/*.nds
+
+.vscode/settings.json

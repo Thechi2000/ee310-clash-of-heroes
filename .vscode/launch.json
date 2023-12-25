@@ -1,0 +1,29 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch gdb-multiarch",
+      "type": "cppdbg",
+      "request": "launch",
+      "miDebuggerPath": "${env:DEVKITARM}/bin/arm-none-eabi-gdb",
+      "miDebuggerArgs": "--cd=${workspaceFolder} --nx",
+      "MIMode": "gdb",
+      "program": "${config:elf_file}",
+      "targetArchitecture": "arm",
+      "setupCommands": [
+        { "text": "set remotetimeout 5" },
+        { "text": "target remote :${config:gdb_port}" },
+        { "text": "file '${config:elf_file}'" },
+        { "text": "load" }
+      ],
+      "launchCompleteCommand": "None",
+      "externalConsole": false,
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "Desmume: Start debug",
+      "postDebugTask": "Desmume: Stop debug"
+    }
+  ]
+}

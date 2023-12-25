@@ -1,0 +1,19 @@
+{
+  "configurations": [
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/source",
+        "${env:DEVKITPRO}/libnds/include/",
+        "${env:DEVKITARM}/arm-none-eabi/include/"
+      ],
+      "defines": ["ARM9"],
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "linux-gcc-arm",
+      "compilerArgs": ["-Wall", "-Wextra"]
+    }
+  ],
+  "version": 4
+}
