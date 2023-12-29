@@ -3,6 +3,7 @@
     {
       "name": "Linux",
       "includePath": [
+        "${workspaceFolder}/build",
         "${workspaceFolder}/source",
         "${env:DEVKITPRO}/libnds/include/",
         "${env:DEVKITARM}/arm-none-eabi/include/"
