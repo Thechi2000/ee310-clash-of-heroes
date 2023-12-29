@@ -4,6 +4,7 @@
 #include "game.hpp"
 
 int main() {
+    irqEnable(IRQ_VBLANK);
     Game::start();
     return 0;
 }
