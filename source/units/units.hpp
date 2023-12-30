@@ -1,3 +1,4 @@
+#pragma once
 #include "game.hpp"
 
 struct Sprite;
@@ -6,11 +7,11 @@ struct Faction;
 struct Pair {
     int x;
     int y;
-} typedef;
+};
 
 // ---------------------------------------------------------------------- // 
 
-class Unit : public Renderable {
+class Unit {
 public:
     void update();
     int disappear(); // return damage dealt
@@ -20,10 +21,10 @@ public:
     Pair getPosition();
 
 protected:
-    Unit(int width, int length) : width_(width), length_(length) {};
-    Unit(Pair size) : width_(size.x), length_(size.y) {};
+    Unit(int width, int length) : width_(width), length_(length) { };
+    Unit(Pair size) : width_(size.x), length_(size.y) { };
 
-private :
+private:
     int width_; // horizontal
     int length_; // vertical
 
@@ -32,31 +33,31 @@ private :
 
     int health;
 
-    Faction faction_;
+    //TODO Faction faction_;
 
     Sprite neutralSprites_;
 };
 
 class SpecialUnit : public Unit {
 protected:
-    SpecialUnit(int width) : Unit(width, 2) {};
+    SpecialUnit(int width) : Unit(width, 2) { };
 };
 
 // ---------------------------------------------------------------------- // 
 
 class CoreUnit : public Unit {
 protected:
-    CoreUnit() : Unit(1, 1) {}; 
+    CoreUnit() : Unit(1, 1) { };
 };
 
 class EliteUnit : public SpecialUnit {
 protected:
-    EliteUnit() : SpecialUnit(1) {};
+    EliteUnit() : SpecialUnit(1) { };
 };
 
 class ChampionUnit : public SpecialUnit {
 protected:
-    ChampionUnit() : SpecialUnit(2) {};
+    ChampionUnit() : SpecialUnit(2) { };
 };
 
 // ---------------------------------------------------------------------- // 
@@ -66,7 +67,7 @@ public:
     static void startCharge(Unit unit);
     virtual void attack();
 protected:
-    ChargingUnit(Unit initialUnit) : Unit(initialUnit.getSize()), isCharging_(true) {};
+    ChargingUnit(Unit initialUnit) : Unit(initialUnit.getSize()), isCharging_(true) { };
 private:
     bool isCharging_ = false;
 
@@ -79,13 +80,13 @@ private:
 
 // ---------------------------------------------------------------------- // 
 
-class WallType : public Renderable {
+class WallType {
 public:
-    WallType(Sprite weakWalls, Sprite strongWalls, int maxHealth) : weakWalls_(weakWalls), strongWalls_(strongWalls), maxHealth_(maxHealth) {};
+    WallType(Sprite weakWalls, Sprite strongWalls, int maxHealth) : weakWalls_(weakWalls), strongWalls_(strongWalls), maxHealth_(maxHealth) { };
 
-    virtual void onCreation() {};
-    virtual void onDestroy() {};
-    virtual void onCombination() {};
+    virtual void onCreation() { };
+    virtual void onDestroy() { };
+    virtual void onCombination() { };
 
 private:
     Sprite weakWalls_;
@@ -95,7 +96,7 @@ private:
 
 class Wall : public Unit {
 protected:
-    Wall() : Unit(1, 1) {};
+    //TODO Wall() : Unit(1, 1) { };
 
 private:
     WallType wallType_;

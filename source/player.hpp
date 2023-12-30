@@ -12,7 +12,7 @@ struct Army {
 
 typedef Unit BattleField[8][6]; // 8 columns of 6-tile units
 
-class Player : public Renderable, public InputHandler {
+class Player {
 public:
     virtual void update();
 private:

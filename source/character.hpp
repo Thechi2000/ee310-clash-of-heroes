@@ -1,12 +1,13 @@
+#pragma once
 #include "game.hpp"
 #include "units/units.hpp"
 
 struct Sprite;
 
-class Character : public Renderable {
-    class CharacterAbility : public Renderable {
+class Character {
+    class CharacterAbility {
     public:
-        CharacterAbility(Sprite notCharged, Sprite fullyCharged) : notCharged_(notCharged), fullyCharged_(fullyCharged), currentCharge_(100) {};
+        CharacterAbility(Sprite notCharged, Sprite fullyCharged) : notCharged_(notCharged), fullyCharged_(fullyCharged), currentCharge_(100) { };
 
         virtual void use();
         virtual void addCharge(int addedCharge);
@@ -19,12 +20,12 @@ class Character : public Renderable {
     };
 
 protected:
-    Character() {};
+    //TODO Character() { }
 private:
     Sprite characterSprite_;
     Sprite damagedCharacterSprite_;
     CharacterAbility ability_;
-    Faction faction_;
+    //TODO Faction faction_;
     int maxHealth_;
     int maxUnits_;
 };

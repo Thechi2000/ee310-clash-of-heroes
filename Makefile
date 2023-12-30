@@ -20,7 +20,7 @@ TARGET		:=	$(shell basename $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	source
 DATA		:=  
-INCLUDES	:=	include
+INCLUDES	:=	include $(SOURCES)
 GRAPHICS	:=	data
 AUDIO       :=  audio
 PRECOMPILED := precompiled
@@ -99,7 +99,6 @@ export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 					$(PRECFILES)					
  
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
-					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 					-I$(CURDIR)/$(BUILD)
  
