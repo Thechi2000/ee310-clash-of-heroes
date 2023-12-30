@@ -1,6 +1,7 @@
 #include "menu.hpp"
 #include "abilities_menu_background.h"
 #include "portraits.h"
+#include "portraitsBackground.h"
 
 struct CharacterDisplay {
     Sprite sprite;
@@ -63,7 +64,7 @@ void drawCharacter(int id, int x, int y) {
     for (int i = 0; i < 16; ++i) {
         for (int j = 0; j < 16; ++j) {
             if (IN_RANGE(i + x, 0, 31) && IN_RANGE(j + y, 0, 23)) {
-                BG_MAP_RAM_SUB(24)[(j + y) * 32 + (i + x)] = portraitsMap[j * 64 + (i + (16 * id))];
+                BG_MAP_RAM_SUB(16)[(j + y) * 32 + (i + x)] = portraitsMap[j * 64 + (i + (16 * id))];
             }
         }
     }
@@ -77,8 +78,6 @@ CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displa
 
     for (int i = 0; i < abilities_menu_backgroundBitmapLen; ++i) {
         BG_BMP_RAM(1)[i] = ((u16*)abilities_menu_backgroundBitmap)[i] | 0x1010;
-
-        //iprintf("%d, %d\n", ((u16*)abilities_menu_backgroundBitmap)[i] | 0x1010);
     }
     for (int i = 0; i < abilities_menu_backgroundSharedPalLen / 2; ++i) {
         BG_PALETTE[i + 16] = abilities_menu_backgroundSharedPal[i];
@@ -92,23 +91,33 @@ CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displa
     bgTransform[3]->dy = 0 * 256;
 
     VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
-    REG_DISPCNT_SUB = MODE_1_2D | DISPLAY_BG1_ACTIVE | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE;
-    BGCTRL_SUB[2] = BG_TILE_BASE(4) | BG_MAP_BASE(24) | BG_32x32 | BG_COLOR_256;
-    BGCTRL_SUB[3] = BG_BMP_BASE(8) | BG_BMP8_256x256;
-    consoleInit(&sub_printer, 1, BgType_Text4bpp, BgSize_T_256x256, 31, 0, false, true);
+    REG_DISPCNT_SUB = MODE_1_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE;
+    BGCTRL_SUB[2] = BG_TILE_BASE(3) | BG_MAP_BASE(16) | BG_32x32 | BG_COLOR_256;
+    BGCTRL_SUB[3] = BG_BMP_BASE(6) | BgSize_B16_256x256;
+    consoleInit(&sub_printer, 1, BgType_Text4bpp, BgSize_T_256x256, 8, 0, false, true);
 
+    bgTransform[7]->hdx = 1 * 256;
+    bgTransform[7]->vdx = 0 * 256;
+    bgTransform[7]->hdy = 0 * 256;
+    bgTransform[7]->vdy = 1 * 256;
+    bgTransform[7]->dx = 0 * 256;
+    bgTransform[7]->dy = 0 * 256;
+
+    memcpy(BG_BMP_RAM_SUB(6), portraitsBackgroundBitmap, portraitsBackgroundBitmapLen);
     memcpy(BG_PALETTE_SUB + 16, portraitsPal, portraitsPalLen);
-    memcpy(BG_TILE_RAM_SUB(4), portraitsTiles, portraitsTilesLen);
+    memcpy(BG_TILE_RAM_SUB(3), portraitsTiles, portraitsTilesLen);
 }
 
 void CharacterSelectionMenu::render() {
     if (displayed_character != selected_character) {
         auto character = &characters[selected_character];
 
+        drawCharacter(CLAMP_CHARACTER_ID(selected_character - 1), -2, 5);
+        drawCharacter(CLAMP_CHARACTER_ID(selected_character + 1), 22, 5);
+        drawCharacter(selected_character, 8, 2);
+
         consoleSelect(&main_printer);
 
-        main_printer.cursorX = 2;
-        main_printer.cursorY = 2;
         printf(
             "\x1B[32m\033[3;4H%s\033[5;3H%s\033[14;4H%s\033[16;3H%s",
             character->spell_name,
@@ -116,10 +125,6 @@ void CharacterSelectionMenu::render() {
             character->wall_name,
             character->wall_description
         );
-
-        drawCharacter(CLAMP_CHARACTER_ID(selected_character - 1), -2, 5);
-        drawCharacter(CLAMP_CHARACTER_ID(selected_character + 1), 22, 5);
-        drawCharacter(selected_character, 8, 2);
 
         consoleSelect(&sub_printer);
         printf("\x1B[32m\033[19;12H%s", character->name);
