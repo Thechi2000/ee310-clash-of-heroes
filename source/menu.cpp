@@ -91,21 +91,20 @@ CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displa
     bgTransform[3]->dy = 0 * 256;
 
     VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
-    REG_DISPCNT_SUB = MODE_1_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE;
-    BGCTRL_SUB[2] = BG_TILE_BASE(3) | BG_MAP_BASE(16) | BG_32x32 | BG_COLOR_256;
-    BGCTRL_SUB[3] = BG_BMP_BASE(6) | BgSize_B16_256x256;
+
+    REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE;
     consoleInit(&sub_printer, 1, BgType_Text4bpp, BgSize_T_256x256, 8, 0, false, true);
+    BGCTRL_SUB[2] = BG_TILE_BASE(4) | BG_MAP_BASE(16) | BG_32x32 | BG_COLOR_256;
+    BGCTRL_SUB[3] = BG_TILE_BASE(8) | BG_MAP_BASE(24) | BG_32x32 | BG_COLOR_256;
 
-    bgTransform[7]->hdx = 1 * 256;
-    bgTransform[7]->vdx = 0 * 256;
-    bgTransform[7]->hdy = 0 * 256;
-    bgTransform[7]->vdy = 1 * 256;
-    bgTransform[7]->dx = 0 * 256;
-    bgTransform[7]->dy = 0 * 256;
+    for (int i = 0; i < portraitsBackgroundTilesLen / 2; ++i) {
+        BG_TILE_RAM_SUB(8)[i] = ((u16*)portraitsBackgroundTiles)[i] | 0x1010;
+    }
+    dmaCopy(portraitsBackgroundSharedPal, BG_PALETTE_SUB + 16, portraitsBackgroundSharedPalLen);
+    dmaCopy(portraitsBackgroundMap, BG_MAP_RAM_SUB(24), portraitsBackgroundMapLen);
 
-    memcpy(BG_BMP_RAM_SUB(6), portraitsBackgroundBitmap, portraitsBackgroundBitmapLen);
-    memcpy(BG_PALETTE_SUB + 16, portraitsPal, portraitsPalLen);
-    memcpy(BG_TILE_RAM_SUB(3), portraitsTiles, portraitsTilesLen);
+    dmaCopy(portraitsTiles, BG_TILE_RAM_SUB(4), portraitsTilesLen);
+    dmaCopy(portraitsPal, BG_PALETTE_SUB + 24, portraitsPalLen);
 }
 
 void CharacterSelectionMenu::render() {
