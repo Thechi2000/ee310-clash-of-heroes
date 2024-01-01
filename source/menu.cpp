@@ -97,14 +97,12 @@ CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displa
     BGCTRL_SUB[2] = BG_TILE_BASE(4) | BG_MAP_BASE(16) | BG_32x32 | BG_COLOR_256;
     BGCTRL_SUB[3] = BG_TILE_BASE(8) | BG_MAP_BASE(24) | BG_32x32 | BG_COLOR_256;
 
-    for (int i = 0; i < portraitsBackgroundTilesLen / 2; ++i) {
-        BG_TILE_RAM_SUB(8)[i] = ((u16*)portraitsBackgroundTiles)[i] | 0x1010;
-    }
-    dmaCopy(portraitsBackgroundSharedPal, BG_PALETTE_SUB + 16, portraitsBackgroundSharedPalLen);
+    dmaCopy(portraitsBackgroundTiles, BG_TILE_RAM_SUB(8), portraitsBackgroundTilesLen);
+    dmaCopy(portraitsBackgroundSharedPal, BG_PALETTE_SUB, portraitsBackgroundSharedPalLen);
     dmaCopy(portraitsBackgroundMap, BG_MAP_RAM_SUB(24), portraitsBackgroundMapLen);
 
     dmaCopy(portraitsTiles, BG_TILE_RAM_SUB(4), portraitsTilesLen);
-    dmaCopy(portraitsPal, BG_PALETTE_SUB + 24, portraitsPalLen);
+    dmaCopy(portraitsPal, BG_PALETTE_SUB + 4, portraitsPalLen);
 }
 
 void CharacterSelectionMenu::render() {
@@ -163,4 +161,18 @@ void CharacterSelectionMenu::handle_inputs() {
 
 void CharacterSelectionMenu::confirmSelection() {
     TO_BE_IMPLEMENTED();
+}
+
+void CharacterSelectionMenu::~CharacterSelectionMenu() {
+    VRAM_A_CR = 0;
+    REG_DISPCNT = 0;
+    BGCTRL[2] = 0;
+    BGCTRL[3] = 0;
+
+    VRAM_C_CR = 0;
+    REG_DISPCNT_SUB = 0;
+    BGCTRL_SUB[0] = 0;
+    BGCTRL_SUB[1] = 0;
+    BGCTRL_SUB[2] = 0;
+    BGCTRL_SUB[3] = 0;
 }

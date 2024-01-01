@@ -7,6 +7,7 @@
 class CharacterSelectionMenu : public GameState {
 public:
     CharacterSelectionMenu();
+    ~CharacterSelectionMenu();
 
     virtual void render();
     virtual void handle_inputs();
