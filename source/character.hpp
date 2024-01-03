@@ -2,8 +2,6 @@
 #include "game.hpp"
 #include "units/units.hpp"
 
-struct Sprite;
-
 class Character {
     class CharacterAbility {
     public:

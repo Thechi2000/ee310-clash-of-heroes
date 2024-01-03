@@ -1,103 +1,71 @@
 #pragma once
 #include "game.hpp"
 
-struct Sprite;
 struct Faction;
 
-struct Pair {
-    int x;
-    int y;
-};
+// ---------------------------------------------------------------------- //
 
-// ---------------------------------------------------------------------- // 
-
-class Unit {
+class Unit
+{
 public:
-    void update();
-    int disappear(); // return damage dealt
-    void transformToWall();
-    void transformToAtack();
-    Pair getSize();
-    Pair getPosition();
+    virtual int disappear() { return 0; } // return damage dealt
+    virtual void transformToWall() = 0;
+    virtual void transformToAtack() = 0;
+    const Vector &getSize() const { return size_; }
 
 protected:
-    Unit(int width, int length) : width_(width), length_(length) { };
-    Unit(Pair size) : width_(size.x), length_(size.y) { };
+    Unit(int width, int length) : size_{.x = width, .y = length} {}
+    Unit(Vector size) : size_(size) {}
 
 private:
-    int width_; // horizontal
-    int length_; // vertical
-
-    int xPos; // horizontal, from left to right
-    int yPos; // vertical, from first row to last one
-
-    int health;
-
-    //TODO Faction faction_;
-
+    Vector size_;
+    int health_;
+    bool is_charging_;
+    int charge_;
+    // TODO Faction faction_;
     Sprite neutralSprites_;
 };
 
-class SpecialUnit : public Unit {
+class SpecialUnit : public Unit
+{
 protected:
-    SpecialUnit(int width) : Unit(width, 2) { };
+    SpecialUnit(int width) : Unit(width, 2){};
 };
 
-// ---------------------------------------------------------------------- // 
+// ---------------------------------------------------------------------- //
 
-class CoreUnit : public Unit {
+class CoreUnit : public Unit
+{
 protected:
-    CoreUnit() : Unit(1, 1) { };
+    CoreUnit() : Unit(1, 1){};
 };
 
-class EliteUnit : public SpecialUnit {
+class EliteUnit : public SpecialUnit
+{
 protected:
-    EliteUnit() : SpecialUnit(1) { };
+    EliteUnit() : SpecialUnit(1){};
 };
 
-class ChampionUnit : public SpecialUnit {
+class ChampionUnit : public SpecialUnit
+{
 protected:
-    ChampionUnit() : SpecialUnit(2) { };
+    ChampionUnit() : SpecialUnit(2){};
 };
 
-// ---------------------------------------------------------------------- // 
+// ---------------------------------------------------------------------- //
 
-class ChargingUnit : public Unit {
+class Wall : public Unit
+{
 public:
-    static void startCharge(Unit unit);
-    virtual void attack();
+    virtual void onCreation(){};
+    virtual void onDestroy(){};
+    virtual void onCombination(){};
+
 protected:
-    ChargingUnit(Unit initialUnit) : Unit(initialUnit.getSize()), isCharging_(true) { };
-private:
-    bool isCharging_ = false;
-
-    int power;
-
-    int currentCharge_;
-    Sprite chargingSprites_;
-    Sprite attackingSprites_;
-};
-
-// ---------------------------------------------------------------------- // 
-
-class WallType {
-public:
-    WallType(Sprite weakWalls, Sprite strongWalls, int maxHealth) : weakWalls_(weakWalls), strongWalls_(strongWalls), maxHealth_(maxHealth) { };
-
-    virtual void onCreation() { };
-    virtual void onDestroy() { };
-    virtual void onCombination() { };
+    Wall(Sprite weakWalls, Sprite strongWalls, int maxHealth) : Unit(1, 1), weakWalls_(weakWalls), strongWalls_(strongWalls), maxHealth_(maxHealth) {}
 
 private:
     Sprite weakWalls_;
     Sprite strongWalls_;
     int maxHealth_;
-};
-
-class Wall : public Unit {
-protected:
-    //TODO Wall() : Unit(1, 1) { };
-
-private:
-    WallType wallType_;
 };

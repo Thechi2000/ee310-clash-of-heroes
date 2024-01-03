@@ -3,7 +3,7 @@
 #include <optional>
 
 struct Vector {
-    int8_t x, y;
+    int x, y;
 };
 
 struct Sprite {

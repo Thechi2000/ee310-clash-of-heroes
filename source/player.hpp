@@ -2,19 +2,29 @@
 #include "units/units.hpp"
 #include "character.hpp"
 
-struct Army {
-    CoreUnit soldierA;
+#include <array>
+
+struct Army
+{
+    /* TODO CoreUnit soldierA;
     CoreUnit soldierB;
     CoreUnit soldierC;
     SpecialUnit specialA;
-    SpecialUnit specialB;
+    SpecialUnit specialB; */
 };
 
-typedef Unit BattleField[8][6]; // 8 columns of 6-tile units
+typedef std::array<Unit*, 48> BattleField; // 8 columns of 6-tile units
 
-class Player {
+class Player
+{
 public:
+    Player();
+    ~Player();
+
     virtual void update();
+
+    Unit*& at(int x, int y);
+
 private:
     Character character_;
     Army army_;
@@ -25,4 +35,3 @@ private:
 
     bool me_; // false if it's the opponent
 };
-
