@@ -163,7 +163,7 @@ void CharacterSelectionMenu::confirmSelection() {
     TO_BE_IMPLEMENTED();
 }
 
-void CharacterSelectionMenu::~CharacterSelectionMenu() {
+CharacterSelectionMenu::~CharacterSelectionMenu() {
     VRAM_A_CR = 0;
     REG_DISPCNT = 0;
     BGCTRL[2] = 0;
