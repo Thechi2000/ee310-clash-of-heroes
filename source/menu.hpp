@@ -10,10 +10,10 @@ public:
     ~CharacterSelectionMenu();
 
     virtual void render();
-    virtual void handle_inputs();
+    virtual GameState* handle_inputs();
 
 private:
-    void confirmSelection();
+    GameState* confirmSelection();
 
     int displayed_character;
     int selected_character;

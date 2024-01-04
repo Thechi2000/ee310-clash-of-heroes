@@ -7,21 +7,13 @@
 class GameState {
 public:
     virtual void render() = 0;
-    virtual void handle_inputs() = 0;
+    virtual GameState* handle_inputs() = 0;
 };
 
 class Game {
 public:
     Game();
-
-    static void start() {
-        Game game;
-        while (1) {
-            game.update();
-            swiWaitForVBlank();
-        }
-    }
-
+    static void start();
     void update();
 
 private:
