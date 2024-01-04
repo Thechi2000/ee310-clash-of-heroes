@@ -6,6 +6,7 @@
 
 class GameState {
 public:
+    virtual ~GameState() {}
     virtual void render() = 0;
     virtual GameState* handle_inputs() = 0;
 };

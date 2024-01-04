@@ -1,6 +1,7 @@
 #include <nds.h>
 #include "game.hpp"
 #include "menu.hpp"
+#include "gameBattle.hpp"
 
 
 void Game::start() {
@@ -11,7 +12,7 @@ void Game::start() {
     }
 }
 
-Game::Game() : game_state_(new CharacterSelectionMenu()) { }
+Game::Game() : game_state_(new GameBattle()) { }
 
 void Game::update() {
     scanKeys();

@@ -22,7 +22,7 @@ protected:
 private:
     Sprite characterSprite_;
     Sprite damagedCharacterSprite_;
-    CharacterAbility ability_;
+    //CharacterAbility ability_;
     //TODO Faction faction_;
     int maxHealth_;
     int maxUnits_;

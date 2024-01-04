@@ -1,6 +1,7 @@
 #pragma once
 #include "units.hpp"
 
+/*
 class Swordsman : public CoreUnit
 {
 public:
@@ -30,3 +31,4 @@ class Angel : public ChampionUnit
 public:
     Angel() : ChampionUnit(){};
 };
+*/
