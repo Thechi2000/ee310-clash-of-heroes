@@ -1,19 +1,7 @@
 #include "game.hpp"
-#include "units/units.hpp"
 #include "character.hpp"
-
-#include <array>
-
-struct Army
-{
-    /* TODO CoreUnit soldierA;
-    CoreUnit soldierB;
-    CoreUnit soldierC;
-    SpecialUnit specialA;
-    SpecialUnit specialB; */
-};
-
-typedef std::array<Unit*, 48> BattleField; // 8 columns of 6-tile units
+#include "units/army.hpp"
+#include "units/units.hpp"
 
 class Player
 {

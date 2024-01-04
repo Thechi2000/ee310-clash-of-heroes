@@ -1,35 +1,48 @@
 #pragma once
 #include "game.hpp"
+#include <array>
 
 struct Faction;
+class Unit;
+typedef std::array<Unit*, 48> BattleField; // 8 columns of 6-tile units
 
 // ---------------------------------------------------------------------- //
 
 class Unit
 {
 public:
-    virtual int disappear() { return 0; } // return damage dealt
-    virtual void transformToWall() = 0;
-    virtual void transformToAtack() = 0;
+    virtual int disappear(); // return damage dealt
+    virtual void onTransformToWall() {};
+    virtual void onTransformToAtack();
     const Vector &getSize() const { return size_; }
 
-protected:
-    Unit(int width, int length) : size_{.x = width, .y = length} {}
-    Unit(Vector size) : size_(size) {}
+    /* Returns true if the unit attacks */
+    virtual bool updateCharge();
+    /* Returns the damage dealt to the ennemi player*/
+    virtual int attack(BattleField opponentBattlefield, int attackedColumn);
 
-private:
+protected:
+    Unit(int width, int length, int charge, int power, int toughness) : Unit({.x = width, .y = length}, charge, power, toughness) {}
+    Unit(Vector size, int charge, int power, int toughness) : size_(size), charge_(charge), power_(power), toughness_(toughness), health_(toughness) {}
+
     Vector size_;
-    int health_;
-    bool is_charging_;
-    int charge_;
+    bool is_charging_ = false;
+
+    int toughness_; // Base health and attack
+    int power_; // Max attack
+    int charge_; // #Turns before attacking
+    int powerPerTurn_; // Power gained every charge turn
     // TODO Faction faction_;
     Sprite neutralSprites_;
+
+    float health_; // Health and initial attack value
+    int remainingChargeTurns_ = 0; // Remaining #turns before attacking
 };
 
 class SpecialUnit : public Unit
 {
 protected:
-    SpecialUnit(int width) : Unit(width, 2){};
+    SpecialUnit(int width, int charge, int power, int toughness) : Unit(width, 2, charge, power, toughness){};
 };
 
 // ---------------------------------------------------------------------- //
@@ -37,19 +50,19 @@ protected:
 class CoreUnit : public Unit
 {
 protected:
-    CoreUnit() : Unit(1, 1){};
+    CoreUnit(int charge, int power, int toughness) : Unit(1, 1, charge, power, toughness) {};
 };
 
 class EliteUnit : public SpecialUnit
 {
 protected:
-    EliteUnit() : SpecialUnit(1){};
+    EliteUnit(int charge, int power, int toughness) : SpecialUnit(1, charge, power, toughness) {};
 };
 
 class ChampionUnit : public SpecialUnit
 {
 protected:
-    ChampionUnit() : SpecialUnit(2){};
+    ChampionUnit(int charge, int power, int toughness) : SpecialUnit(2, charge, power, toughness) {};
 };
 
 // ---------------------------------------------------------------------- //
@@ -62,10 +75,10 @@ public:
     virtual void onCombination(){};
 
 protected:
-    Wall(Sprite weakWalls, Sprite strongWalls, int maxHealth) : Unit(1, 1), weakWalls_(weakWalls), strongWalls_(strongWalls), maxHealth_(maxHealth) {}
+    /* Power : Max health / Toughness : Initial health */
+    Wall(Sprite weakWalls, Sprite strongWalls, int maxHealth) : Unit(1, 1, 0, 16, 8), weakWalls_(weakWalls), strongWalls_(strongWalls) {}
 
 private:
     Sprite weakWalls_;
     Sprite strongWalls_;
-    int maxHealth_;
 };

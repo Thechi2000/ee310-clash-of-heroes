@@ -17,6 +17,8 @@ class Character {
         int currentCharge_; // percentage
     };
 
+public:
+    Character(); // TODO : Remove
 protected:
     //TODO Character() { }
 private:
