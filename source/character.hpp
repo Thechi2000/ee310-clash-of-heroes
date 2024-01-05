@@ -1,6 +1,6 @@
 #pragma once
 #include "game.hpp"
-#include "units/units.hpp"
+#include "units.hpp"
 
 class Character {
     class CharacterAbility {
@@ -18,13 +18,13 @@ class Character {
     };
 
 public:
-    Character(); // TODO : Remove
+    Character() {} // TODO : Remove
 protected:
     //TODO Character() { }
 private:
     Sprite characterSprite_;
     Sprite damagedCharacterSprite_;
-    CharacterAbility ability_;
+    //CharacterAbility ability_;
     //TODO Faction faction_;
     int maxHealth_;
     int maxUnits_;

@@ -1,11 +1,27 @@
 #include <nds.h>
 #include "game.hpp"
 #include "menu.hpp"
+#include "gameBattle.hpp"
 
-Game::Game() : game_state_(new CharacterSelectionMenu()) { }
+
+void Game::start() {
+    Game game;
+    while (1) {
+        game.update();
+        swiWaitForVBlank();
+    }
+}
+
+Game::Game() : game_state_(new GameBattle()) { }
 
 void Game::update() {
     scanKeys();
-    game_state_->handle_inputs();
+
+    auto new_game_state = game_state_->handle_inputs();
+    if (new_game_state != nullptr) {
+        delete game_state_;
+        game_state_ = new_game_state;
+    }
+
     game_state_->render();
 }

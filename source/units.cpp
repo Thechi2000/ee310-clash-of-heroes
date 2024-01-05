@@ -5,7 +5,7 @@ int Unit::disappear() {
     return std::round(health_);
 }
 
-void Unit::onTransformToAtack() {
+void Unit::onTransformToAttack() {
     is_charging_ = true;
     
 }
@@ -25,7 +25,7 @@ bool Unit::updateCharge() {
     return false;
 }
 
-int Unit::attack(BattleField opponentBattlefield, int attackedColumn) {
+int Unit::attack(BattleField& opponentBattlefield, int attackedColumn) {
     if (!is_charging_) {
         return 0;
     }

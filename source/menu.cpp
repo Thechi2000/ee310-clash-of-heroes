@@ -130,7 +130,7 @@ void CharacterSelectionMenu::render() {
     }
 }
 
-void CharacterSelectionMenu::handle_inputs() {
+GameState* CharacterSelectionMenu::handle_inputs() {
     int keys = keysDown();
 
     if (keys & KEY_RIGHT) {
@@ -138,7 +138,7 @@ void CharacterSelectionMenu::handle_inputs() {
     } else if (keys & KEY_LEFT) {
         selected_character--;
     } else if (keys & KEY_A) {
-        confirmSelection();
+        return confirmSelection();
     }
 
     if (keys & KEY_TOUCH) {
@@ -146,7 +146,7 @@ void CharacterSelectionMenu::handle_inputs() {
         int x = pos.px, y = pos.py;
 
         if (IN_RANGE(x, 64, 191) && IN_RANGE(y, 16, 143)) {
-            confirmSelection();
+            return confirmSelection();
         } else if (IN_RANGE(y, 80, 207)) {
             if (IN_RANGE(x, 0, 111)) {
                 selected_character--;
@@ -159,7 +159,7 @@ void CharacterSelectionMenu::handle_inputs() {
     selected_character = CLAMP_CHARACTER_ID(selected_character);
 }
 
-void CharacterSelectionMenu::confirmSelection() {
+GameState* CharacterSelectionMenu::confirmSelection() {
     TO_BE_IMPLEMENTED();
 }
 
