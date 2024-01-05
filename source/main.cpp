@@ -5,6 +5,7 @@
 
 int main() {
     irqEnable(IRQ_VBLANK);
+    setupTime();
     Game::start();
     return 0;
 }

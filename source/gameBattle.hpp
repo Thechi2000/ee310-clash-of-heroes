@@ -13,4 +13,6 @@ public:
 private:
     Player playerA_;
     Player playerB_;
+
+    int secondsPassed_;
 };
