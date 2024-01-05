@@ -31,3 +31,6 @@ void setupTime() {
 const Time& currentTime() {
     return time;
 }
+void resetTime() {
+    time = Time{ .minutes = 0,.seconds = 0,.milliseconds = 0 };
+}

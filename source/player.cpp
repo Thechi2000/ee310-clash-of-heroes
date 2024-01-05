@@ -4,20 +4,18 @@
 
 #define SPRITE_SIZE (32 * 32)
 
-class TestUnit : public Unit
-{
+class TestUnit : public Unit {
 public:
-    virtual ~TestUnit() {}
+    virtual ~TestUnit() { }
 
-    TestUnit(int x, int y, int spriteId) : Unit(x, y, 3, 6, 4, spriteId) {}
+    TestUnit(int x, int y, int spriteId) : Unit(x, y, 3, 6, 4, spriteId) { }
 
-    void onTransformToAttack() {}
-    void onTransformToWall() {}
-    bool updateCharge() {}
+    void onTransformToAttack() { }
+    void onTransformToWall() { }
+    bool updateCharge() { }
 };
 
-Player::Player()
-{
+Player::Player() {
     battleField_.fill(nullptr);
 
     // TODO REMOVE
@@ -25,20 +23,24 @@ Player::Player()
     me_ = isMe;
     isMe = true;
 
-    for (int i = 0; i < 48; ++i)
-    {
+    for (int i = 0; i < 48; ++i) {
         battleField_[i] = new TestUnit(1, 1, i % 9);
     }
     // END REMOVE
 
-    if (me_)
-    {
-        VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
-        REG_DISPCNT_SUB = MODE_5_2D | DISPLAY_BG2_ACTIVE;
-        BGCTRL_SUB[2] = BG_BMP_BASE(0) | BgSize_B8_256x256;
+    consoleInit(&console_, 0, BgType_Text4bpp, BgSize_T_256x256, 8, 0, !me_, true);
 
-        dmaCopy(sylvanBgBitmap, BG_BMP_RAM_SUB(0), sylvanBgBitmapLen);
+    if (me_) {
+        VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
+        REG_DISPCNT_SUB = MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG2_ACTIVE;
+        BGCTRL_SUB[2] = BG_BMP_BASE(4) | BgSize_B8_256x256;
+
+        mdCopy(BG_BMP_RAM_SUB(4), sylvanBgBitmap, sylvanBgBitmapLen, [](u8 a, size_t i, u8* array) {
+            while (array[i] == 255) { i--; }
+            return array[i];
+            });
         dmaCopy(sylvanBgPal, BG_PALETTE_SUB, sylvanBgPalLen);
+        BG_PALETTE_SUB[255] = ARGB16(1, 28, 60, 28);
 
         bgTransform[6]->hdx = -1 * 256;
         bgTransform[6]->vdx = 0 * 256;
@@ -49,15 +51,17 @@ Player::Player()
 
         VRAM_D_CR = VRAM_ENABLE | VRAM_D_SUB_SPRITE;
         swiCopy(pal(), SPRITE_PALETTE_SUB, palLen() / 2);
-    }
-    else
-    {
+    } else {
         VRAM_A_CR = VRAM_ENABLE | VRAM_A_MAIN_BG;
-        REG_DISPCNT = MODE_5_2D | DISPLAY_BG2_ACTIVE;
-        BGCTRL[2] = BG_BMP_BASE(0) | BgSize_B8_256x256;
+        REG_DISPCNT = MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG2_ACTIVE;
+        BGCTRL[2] = BG_BMP_BASE(4) | BgSize_B8_256x256;
 
-        dmaCopy(sylvanBgBitmap, BG_BMP_RAM(0), sylvanBgBitmapLen);
+        mdCopy(BG_BMP_RAM(4), sylvanBgBitmap, sylvanBgBitmapLen, [](u8 a, size_t i, u8* array) {
+            while (array[i] == 255) { i--; }
+            return array[i];
+            });
         dmaCopy(sylvanBgPal, BG_PALETTE, sylvanBgPalLen);
+        BG_PALETTE[255] = ARGB16(1, 28, 60, 28);
 
         bgTransform[2]->hdx = 1 * 256;
         bgTransform[2]->vdx = 0 * 256;
@@ -72,46 +76,37 @@ Player::Player()
 
     oamInit(oam(), SpriteMapping_1D_128, false);
 
-    for (int i = 0; i < tilesLen() / SPRITE_SIZE; ++i)
-    {
+    for (int i = 0; i < tilesLen() / SPRITE_SIZE; ++i) {
         auto gfx = oamAllocateGfx(oam(), SpriteSize_32x32, SpriteColorFormat_256Color);
         spritesGfx_.push_back(gfx);
         swiCopy(tiles() + i * SPRITE_SIZE, gfx, SPRITE_SIZE / 2);
     }
 }
 
-Unit *&Player::at(int x, int y)
-{
+Unit*& Player::at(int x, int y) {
     return battleField_[x + 8 * y];
 }
 
-OamState *Player::oam() const
-{
+OamState* Player::oam() const {
     return me_ ? &oamSub : &oamMain;
 }
-const void *Player::tiles() const { return sylvanUnitsTiles; }
+const void* Player::tiles() const { return sylvanUnitsTiles; }
 size_t Player::tilesLen() const { return sylvanUnitsTilesLen; }
-const void *Player::pal() const { return sylvanUnitsPal; }
+const void* Player::pal() const { return sylvanUnitsPal; }
 size_t Player::palLen() const { return sylvanUnitsPalLen; }
 
-void Player::render()
-{
-    for (size_t x = 0; x < 8; ++x)
-    {
-        for (size_t y = 0; y < 6; ++y)
-        {
+void Player::render() {
+    for (size_t x = 0; x < 8; ++x) {
+        for (size_t y = 0; y < 6; ++y) {
             auto unit = at(x, y);
-            if (unit != nullptr)
-            {
-                Vector relativePosition{.x = 0, .y = 0};
-                while (at(x - relativePosition.x, y) == unit)
-                {
+            if (unit != nullptr) {
+                Vector relativePosition{ .x = 0, .y = 0 };
+                while (at(x - relativePosition.x, y) == unit) {
                     ++relativePosition.x;
                 }
                 relativePosition.x--;
 
-                while (at(x - relativePosition.x, y - relativePosition.y) == unit)
-                {
+                while (at(x - relativePosition.x, y - relativePosition.y) == unit) {
                     ++relativePosition.y;
                 }
                 relativePosition.y--;
@@ -136,22 +131,23 @@ void Player::render()
     }
 
     oamUpdate(oam());
+
+    auto time = currentTime();
+    consoleSelect(&console_);
+    console_.cursorX = (me_ ? 2 : 26);
+    console_.cursorY = (me_ ? 22 : 1);
+    printf("%ld:%ld", time.minutes, time.seconds);
 }
 
-void Player::update() {}
+void Player::update() { }
 
-Player::~Player()
-{
-    for (size_t i = 0; i < battleField_.size(); ++i)
-    {
+Player::~Player() {
+    for (size_t i = 0; i < battleField_.size(); ++i) {
         auto unit = battleField_[i];
 
-        if (unit != nullptr)
-        {
-            for (size_t x = 0; x < unit->getSize().x; ++x)
-            {
-                for (size_t y = 0; y < unit->getSize().y; ++y)
-                {
+        if (unit != nullptr) {
+            for (size_t x = 0; x < unit->getSize().x; ++x) {
+                for (size_t y = 0; y < unit->getSize().y; ++y) {
                     at(x, y) = nullptr;
                 }
             }
@@ -160,8 +156,7 @@ Player::~Player()
         }
     }
 
-    for (auto gfx : spritesGfx_)
-    {
+    for (auto gfx : spritesGfx_) {
         oamFreeGfx(oam(), gfx);
     }
 }

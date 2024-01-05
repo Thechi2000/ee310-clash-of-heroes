@@ -8,4 +8,5 @@ struct Time {
 
 const Time& currentTime();
 void setupTime();
+void resetTime();
 

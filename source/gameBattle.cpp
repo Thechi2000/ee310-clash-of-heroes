@@ -1,7 +1,9 @@
 #include "gameBattle.hpp"
 #include "sylvanBg.h"
 #include "sylvanUnits.h"
-GameBattle::GameBattle() { }
+GameBattle::GameBattle() {
+    resetTime();
+ }
 
 void GameBattle::render() {
     playerA_.render();

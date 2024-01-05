@@ -32,4 +32,6 @@ private:
     std::vector<u16*> spritesGfx_;
 
     bool me_; // false if it's the opponent
+
+    PrintConsole console_;
 };
