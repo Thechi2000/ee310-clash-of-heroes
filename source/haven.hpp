@@ -6,29 +6,33 @@
 class Swordsman : public CoreUnit
 {
 public:
-    Swordsman() : CoreUnit(3, 11, 3, 0) {};
+    Swordsman(BattleField &currentBattlefield) : CoreUnit(3, 11, 3, currentBattlefield, 0) {};
 };
 
 class Archer : public CoreUnit
 {
 public:
-    Archer() : CoreUnit(2, 8, 3, 0) {};
+    Archer(BattleField &currentBattlefield) : CoreUnit(2, 8, 3, currentBattlefield, 0) {};
 };
 
 class Spearman : public CoreUnit
 {
 public:
-    Spearman() : CoreUnit(3, 9, 2, 0) {};
+    Spearman(BattleField &currentBattlefield) : CoreUnit(3, 9, 2, currentBattlefield, 0) {};
+    int attack(BattleField& opponentBattlefield, int attackedColumn);
 };
 
 class Knight : public EliteUnit
 {
 public:
-    Knight() : EliteUnit(4, 30, 6, 0) {};
+    Knight(BattleField &currentBattlefield) : EliteUnit(4, 30, 6, currentBattlefield, 0) {};
+    void onTransformToAttack();
+    bool updateCharge();
 };
 
 class Angel : public ChampionUnit
 {
 public:
-    Angel() : ChampionUnit(6, 115, 23, 0) {};
+    Angel(BattleField &currentBattlefield) : ChampionUnit(6, 115, 23, currentBattlefield, 0) {};
+    bool updateCharge();
 };

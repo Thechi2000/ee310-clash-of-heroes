@@ -1,5 +1,9 @@
 #pragma once
 
+enum Faction {
+    Haven,
+};
+
 enum CoreUnitType {
     // Haven
     Soldier,
