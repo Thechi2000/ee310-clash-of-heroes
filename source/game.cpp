@@ -12,7 +12,7 @@ void Game::start() {
     }
 }
 
-Game::Game() : game_state_(new GameBattle()) { }
+Game::Game() : game_state_(new CharacterSelectionMenu()) { }
 
 void Game::update() {
     scanKeys();

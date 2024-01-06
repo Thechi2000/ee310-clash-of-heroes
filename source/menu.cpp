@@ -2,6 +2,8 @@
 #include "abilities_menu_background.h"
 #include "portraits.h"
 #include "portraitsBackground.h"
+#include <maxmod9.h>
+#include "soundbank.h"
 
 struct CharacterDisplay {
     Sprite sprite;
@@ -60,7 +62,6 @@ const size_t spritesheet_width = 720;
 void drawCharacter(int id, int x, int y) {
     assert(0 <= id && id < character_count);
 
-
     for (int i = 0; i < 16; ++i) {
         for (int j = 0; j < 16; ++j) {
             if (IN_RANGE(i + x, 0, 31) && IN_RANGE(j + y, 0, 23)) {
@@ -103,6 +104,13 @@ CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displa
 
     dmaCopy(portraitsTiles, BG_TILE_RAM_SUB(4), portraitsTilesLen);
     dmaCopy(portraitsPal, BG_PALETTE_SUB + 4, portraitsPalLen);
+
+    mmLoad(MOD_MENU);
+    mmLoadEffect(SFX_MENU_SELECT);
+    mmLoadEffect(SFX_MENU_SWAP);
+
+    mmStart(MOD_MENU, MM_PLAY_LOOP);
+    mmSetModuleVolume(256);
 }
 
 void CharacterSelectionMenu::render() {
@@ -134,10 +142,13 @@ GameState* CharacterSelectionMenu::handle_inputs() {
     int keys = keysDown();
 
     if (keys & KEY_RIGHT) {
+        mmEffect(SFX_MENU_SWAP);
         selected_character++;
     } else if (keys & KEY_LEFT) {
+        mmEffect(SFX_MENU_SWAP);
         selected_character--;
     } else if (keys & KEY_A) {
+        mmEffect(SFX_MENU_SELECT);
         return confirmSelection();
     }
 
@@ -157,10 +168,12 @@ GameState* CharacterSelectionMenu::handle_inputs() {
     }
 
     selected_character = CLAMP_CHARACTER_ID(selected_character);
+
+    return nullptr;
 }
 
 GameState* CharacterSelectionMenu::confirmSelection() {
-    TO_BE_IMPLEMENTED();
+    return nullptr;
 }
 
 CharacterSelectionMenu::~CharacterSelectionMenu() {
@@ -175,4 +188,8 @@ CharacterSelectionMenu::~CharacterSelectionMenu() {
     BGCTRL_SUB[1] = 0;
     BGCTRL_SUB[2] = 0;
     BGCTRL_SUB[3] = 0;
+
+    mmUnload(MOD_MENU);
+    mmUnloadEffect(SFX_MENU_SELECT);
+    mmUnloadEffect(SFX_MENU_SWAP);
 }
