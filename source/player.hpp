@@ -12,6 +12,7 @@ public:
     virtual void update();
 
     void render();
+    void handleInputs();
 
     Unit*& at(int x, int y);
 
@@ -22,12 +23,18 @@ private:
     const void* pal() const;
     size_t palLen() const;
 
+    bool hasSelectedUnit() const;
+
     Character character_;
     Army army_;
     BattleField battleField_;
 
     int currentHealth_;
     int invocableUnits_;
+
+    Vector selectedUnit_;
+    uint32_t keyAPressedAt_;
+    uint32_t touchScreenPressedAt_;
 
     std::vector<u16*> spritesGfx_;
 

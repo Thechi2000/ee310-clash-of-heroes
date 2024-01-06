@@ -10,3 +10,6 @@ const Time& currentTime();
 void setupTime();
 void resetTime();
 
+uint32_t timeAsSeconds(); 
+uint32_t timeAsMilliseconds();
+

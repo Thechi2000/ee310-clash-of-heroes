@@ -34,3 +34,10 @@ const Time& currentTime() {
 void resetTime() {
     time = Time{ .minutes = 0,.seconds = 0,.milliseconds = 0 };
 }
+
+uint32_t timeAsSeconds() {
+    return time.seconds + time.minutes * 60;
+}
+uint32_t timeAsMilliseconds() {
+    return time.milliseconds + 1000 * (time.seconds + time.minutes * 60);
+}

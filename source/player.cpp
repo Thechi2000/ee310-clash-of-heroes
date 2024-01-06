@@ -15,7 +15,7 @@ public:
     bool updateCharge() { }
 };
 
-Player::Player() {
+Player::Player() : selectedUnit_{ -1, -1 } {
     battleField_.fill(nullptr);
 
     // TODO REMOVE
@@ -95,6 +95,8 @@ size_t Player::tilesLen() const { return sylvanUnitsTilesLen; }
 const void* Player::pal() const { return sylvanUnitsPal; }
 size_t Player::palLen() const { return sylvanUnitsPalLen; }
 
+bool Player::hasSelectedUnit() const { return selectedUnit_.x != -1 && selectedUnit_.y != -1; }
+
 void Player::render() {
     for (size_t x = 0; x < 8; ++x) {
         for (size_t y = 0; y < 6; ++y) {
@@ -111,11 +113,13 @@ void Player::render() {
                 }
                 relativePosition.y--;
 
+                bool isSelected = selectedUnit_.x == x && selectedUnit_.y == y;
+
                 auto spriteId = unit->getSpriteIdAt(relativePosition);
                 oamSet(
                     oam(),
                     x + y * 8,
-                    x * 28 + 16, y * 28 + (me_ ? 0 : 20),
+                    x * 28 + 16, y * 28 + (me_ ? 0 : 20) + (isSelected ? 5 : 0),
                     0,
                     0,
                     SpriteSize_32x32,
@@ -134,9 +138,71 @@ void Player::render() {
 
     auto time = currentTime();
     consoleSelect(&console_);
-    console_.cursorX = (me_ ? 2 : 26);
+    console_.cursorX = (me_ ? 1 : 25);
     console_.cursorY = (me_ ? 22 : 1);
-    printf("%ld:%ld", time.minutes, time.seconds);
+    printf("%0.2ld:%0.2ld", time.minutes, time.seconds);
+    printf(";%ld %ld", touchScreenPressedAt_, keyAPressedAt_);
+}
+
+void Player::handleInputs() {
+    if (!me_) { return; }
+
+    auto keys = keysDown();
+    if (!hasSelectedUnit() && (keys & (KEY_UP | KEY_DOWN | KEY_RIGHT | KEY_LEFT))) {
+        selectedUnit_.x = 0;
+        selectedUnit_.y = 0;
+    }
+
+    if (keys & KEY_UP) { selectedUnit_.y = selectedUnit_.y - 1; }
+    if (keys & KEY_DOWN) { selectedUnit_.y = selectedUnit_.y + 1; }
+    if (keys & KEY_LEFT) { selectedUnit_.x = selectedUnit_.x - 1; }
+    if (keys & KEY_RIGHT) { selectedUnit_.x = selectedUnit_.x + 1; }
+
+    if (keys & KEY_B) {
+        selectedUnit_.x = -1;
+        selectedUnit_.y = -1;
+    }
+
+    if (hasSelectedUnit()) {
+        if (keys & (KEY_A | KEY_TOUCH)) {
+            if (keys & KEY_A) {
+                keyAPressedAt_ = timeAsMilliseconds();
+            }
+
+
+            if (keys & KEY_TOUCH) {
+                touchPosition pos = touchReadXY();
+
+                if (IN_RANGE(pos.px, 16, 240) && IN_RANGE(pos.py, 0, 168)) {
+                    int x = (pos.px - 16) / 32;
+                    int y = pos.py / 32;
+
+                    if (selectedUnit_.x != x || selectedUnit_.y != y) {
+                        touchScreenPressedAt_ = timeAsMilliseconds();
+                    }
+
+                    selectedUnit_.x = x;
+                    selectedUnit_.y = y;
+                }
+            }
+        } else {
+            uint64_t heldTime = 0;
+            if (keyAPressedAt_ && !(keysHeld() & KEY_A)) {
+                heldTime = timeAsMilliseconds() - keyAPressedAt_;
+                keyAPressedAt_ = 0;
+            }
+            if (touchScreenPressedAt_ && !(keysHeld() & KEY_TOUCH)) {
+                heldTime = timeAsMilliseconds() - touchScreenPressedAt_;
+                touchScreenPressedAt_ = 0;
+            }
+
+            if (heldTime > 2000) {
+                TO_BE_IMPLEMENTED();
+            } else if (heldTime > 0) {
+                TO_BE_IMPLEMENTED();
+            }
+        }
+    }
 }
 
 void Player::update() { }
