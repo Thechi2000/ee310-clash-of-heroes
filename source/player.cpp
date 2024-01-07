@@ -176,12 +176,12 @@ void Player::handleInputs() {
     if (!hasSelectedUnit() && (keys & (KEY_UP | KEY_DOWN | KEY_RIGHT | KEY_LEFT))) {
         selectedUnit_.x = 0;
         selectedUnit_.y = 0;
+    } else {
+        if (keys & KEY_UP) { selectedUnit_.y = selectedUnit_.y - 1; }
+        if (keys & KEY_DOWN) { selectedUnit_.y = selectedUnit_.y + 1; }
+        if (keys & KEY_LEFT) { selectedUnit_.x = selectedUnit_.x - 1; }
+        if (keys & KEY_RIGHT) { selectedUnit_.x = selectedUnit_.x + 1; }
     }
-
-    if (keys & KEY_UP) { selectedUnit_.y = selectedUnit_.y - 1; }
-    if (keys & KEY_DOWN) { selectedUnit_.y = selectedUnit_.y + 1; }
-    if (keys & KEY_LEFT) { selectedUnit_.x = selectedUnit_.x - 1; }
-    if (keys & KEY_RIGHT) { selectedUnit_.x = selectedUnit_.x + 1; }
 
     if (keys & KEY_B) {
         selectedUnit_.x = -1;
