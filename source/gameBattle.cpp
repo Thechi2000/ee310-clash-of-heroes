@@ -1,7 +1,9 @@
 #include "gameBattle.hpp"
 #include "sylvanBg.h"
 #include "sylvanUnits.h"
-GameBattle::GameBattle() {
+GameBattle::GameBattle(Faction firstPlayer, Faction secondPlayer) :
+    playerA_(firstPlayer),
+    playerB_(secondPlayer) {
     resetTime();
 }
 

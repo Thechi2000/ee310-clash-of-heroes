@@ -6,7 +6,7 @@
 
 class Player {
 public:
-    Player();
+    Player(Faction faction);
     ~Player();
 
     virtual void update();
@@ -18,14 +18,9 @@ public:
 
 private:
     OamState* oam() const;
-    const void* tiles() const;
-    size_t tilesLen() const;
-    const void* pal() const;
-    size_t palLen() const;
-
     bool hasSelectedUnit() const;
 
-    Character character_;
+    Character* character_;
     Army army_;
     BattleField battleField_;
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "game.hpp" 
+#include "character.hpp"
 
 #include <optional>
 #include <vector>
@@ -19,4 +20,7 @@ private:
     int selected_character;
 
     PrintConsole main_printer, sub_printer;
+
+    std::optional<Faction> firstPlayerFaction_;
+    std::optional<Faction> secondPlayerFaction_;
 };

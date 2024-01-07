@@ -4,7 +4,7 @@
 
 class GameBattle : public GameState {
 public:
-    GameBattle();
+    GameBattle(Faction firstPlayer, Faction secondPlayer);
     ~GameBattle() { }
 
     void render();
@@ -13,6 +13,4 @@ public:
 private:
     Player playerA_;
     Player playerB_;
-
-    int secondsPassed_;
 };

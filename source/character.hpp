@@ -2,6 +2,10 @@
 #include "game.hpp"
 #include "units.hpp"
 
+enum class Faction {
+    SYLVAN
+};
+
 class Character {
     class CharacterAbility {
     public:
@@ -18,14 +22,27 @@ class Character {
     };
 
 public:
-    Character() {} // TODO : Remove
+    static Character* fromFaction(Faction faction);
+
+    const void* spriteTiles;
+    const size_t spriteTilesLen;
+    const void* spritePal;
+    const size_t spritePalLen;
+    const void* bgBmp;
+    const size_t bgBmpLen;
+    const void* bgPal;
+    const size_t bgPalLen;
 protected:
-    //TODO Character() { }
-private:
-    Sprite characterSprite_;
-    Sprite damagedCharacterSprite_;
+    Character(
+        const void* spriteTiles, size_t spriteTilesLen,
+        const void* spritePal, size_t spritePalLen,
+        const void* bgBmp, size_t bgBmpLen,
+        const void* bgPal, size_t bgPalLen,
+        int maxHealth,
+        int maxUnits
+    );
+
     //CharacterAbility ability_;
-    //TODO Faction faction_;
     int maxHealth_;
     int maxUnits_;
 };
