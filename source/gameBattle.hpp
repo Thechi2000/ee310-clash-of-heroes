@@ -5,10 +5,13 @@
 class GameBattle : public GameState {
 public:
     GameBattle(Faction firstPlayer, Faction secondPlayer);
-    ~GameBattle() { }
+    ~GameBattle();
 
     void render();
     GameState* handle_inputs();
+
+    virtual void init();
+    virtual void deinit();
 
 private:
     Player playerA_;

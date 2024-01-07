@@ -16,6 +16,8 @@ public:
 
     Unit*& at(int x, int y);
 
+    void init();
+
 private:
     OamState* oam() const;
     bool hasSelectedUnit() const;

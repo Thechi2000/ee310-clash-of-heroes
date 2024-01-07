@@ -13,6 +13,9 @@ public:
     virtual void render();
     virtual GameState* handle_inputs();
 
+    virtual void init();
+    virtual void deinit();
+
 private:
     GameState* confirmSelection();
 

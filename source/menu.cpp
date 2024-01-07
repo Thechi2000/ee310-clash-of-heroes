@@ -76,7 +76,10 @@ void drawCharacter(int id, int x, int y) {
     }
 }
 
-CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displayed_character(-1) {
+CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displayed_character(-1) { }
+CharacterSelectionMenu::~CharacterSelectionMenu() { }
+
+void CharacterSelectionMenu::init() {
     VRAM_A_CR = VRAM_ENABLE | VRAM_A_MAIN_BG;
     REG_DISPCNT = MODE_3_2D | DISPLAY_BG3_ACTIVE;
     BGCTRL[3] = BG_BMP_BASE(1) | BG_BMP8_256x256;
@@ -116,6 +119,23 @@ CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displa
 
     mmStart(MOD_MENU, MM_PLAY_LOOP);
     mmSetModuleVolume(256);
+}
+void CharacterSelectionMenu::deinit() {
+    VRAM_A_CR = 0;
+    REG_DISPCNT = 0;
+    BGCTRL[2] = 0;
+    BGCTRL[3] = 0;
+
+    VRAM_C_CR = 0;
+    REG_DISPCNT_SUB = 0;
+    BGCTRL_SUB[0] = 0;
+    BGCTRL_SUB[1] = 0;
+    BGCTRL_SUB[2] = 0;
+    BGCTRL_SUB[3] = 0;
+
+    mmUnload(MOD_MENU);
+    mmUnloadEffect(SFX_MENU_SELECT);
+    mmUnloadEffect(SFX_MENU_SWAP);
 }
 
 void CharacterSelectionMenu::render() {
@@ -195,11 +215,4 @@ GameState* CharacterSelectionMenu::confirmSelection() {
     selected_character = 0;
 
     return (firstPlayerFaction_.has_value() && secondPlayerFaction_.has_value()) ? new GameBattle(firstPlayerFaction_.value(), secondPlayerFaction_.value()) : nullptr;
-}
-
-CharacterSelectionMenu::~CharacterSelectionMenu() {
-    mmStop();
-    mmUnload(MOD_MENU);
-    mmUnloadEffect(SFX_MENU_SELECT);
-    mmUnloadEffect(SFX_MENU_SWAP);
 }

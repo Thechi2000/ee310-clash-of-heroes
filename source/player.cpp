@@ -25,12 +25,14 @@ Player::Player(Faction faction) : character_(Character::fromFaction(faction)), s
         battleField_[i] = new TestUnit(1, 1, i % 9);
     }
     // END REMOVE
+}
 
+void Player::init() {
     consoleInit(&console_, 0, BgType_Text4bpp, BgSize_T_256x256, 8, 0, !me_, true);
 
     if (me_) {
         VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
-        REG_DISPCNT_SUB = MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG2_ACTIVE;
+        REG_DISPCNT_SUB = 0;
         BGCTRL_SUB[2] = BG_BMP_BASE(4) | BgSize_B8_256x256;
 
         mdCopy(BG_BMP_RAM_SUB(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8* array) {
@@ -51,7 +53,7 @@ Player::Player(Faction faction) : character_(Character::fromFaction(faction)), s
         swiCopy(character_->spritePal, SPRITE_PALETTE_SUB, character_->spritePalLen / 2);
     } else {
         VRAM_A_CR = VRAM_ENABLE | VRAM_A_MAIN_BG;
-        REG_DISPCNT = MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG2_ACTIVE;
+        REG_DISPCNT = 0;
         BGCTRL[2] = BG_BMP_BASE(4) | BgSize_B8_256x256;
 
         mdCopy(BG_BMP_RAM(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8* array) {
@@ -80,6 +82,7 @@ Player::Player(Faction faction) : character_(Character::fromFaction(faction)), s
         swiCopy(character_->spriteTiles + i * SPRITE_SIZE, gfx, SPRITE_SIZE / 2);
     }
 }
+
 Player::~Player() {
     delete character_;
 
@@ -152,11 +155,18 @@ void Player::render() {
     oamUpdate(oam());
 
     auto time = currentTime();
+
     consoleSelect(&console_);
+    consoleClear();
     console_.cursorX = (me_ ? 1 : 25);
     console_.cursorY = (me_ ? 22 : 1);
     printf("%0.2ld:%0.2ld", time.minutes, time.seconds);
-    printf(";%ld %ld", touchScreenPressedAt_, keyAPressedAt_);
+
+    if (me_) {
+        REG_DISPCNT_SUB |= MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG2_ACTIVE;
+    } else {
+        REG_DISPCNT |= MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG2_ACTIVE;
+    }
 }
 
 void Player::handleInputs() {

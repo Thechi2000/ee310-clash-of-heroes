@@ -9,6 +9,9 @@ public:
     virtual ~GameState() {}
     virtual void render() = 0;
     virtual GameState* handle_inputs() = 0;
+
+    virtual void init() = 0;
+    virtual void deinit() = 0;
 };
 
 class Game {
