@@ -6,7 +6,7 @@ class TestUnit : public Unit {
 public:
     virtual ~TestUnit() { }
 
-    TestUnit(int x, int y, int spriteId) : Unit(x, y, 3, 6, 4, spriteId) { }
+    TestUnit(int x, int y, int spriteId, BattleField& battlefield) : Unit(x, y, 3, 6, 4, battlefield, spriteId) { }
 
     void onTransformToAttack() { }
     void onTransformToWall() { }
@@ -22,7 +22,7 @@ Player::Player(Faction faction) : character_(Character::fromFaction(faction)), s
     isMe = true;
 
     for (int i = 0; i < 48; ++i) {
-        battleField_[i] = new TestUnit(1, 1, i % 9);
+        battleField_[i] = new TestUnit(1, 1, i % 9, battleField_);
     }
     // END REMOVE
 }

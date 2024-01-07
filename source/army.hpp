@@ -2,6 +2,7 @@
 
 enum Faction {
     Haven,
+    Sylvan,
 };
 
 enum CoreUnitType {

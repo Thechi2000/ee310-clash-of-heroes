@@ -26,7 +26,7 @@ const CharacterDisplay characters[] = { CharacterDisplay {
         .wall_description = "wall test test test",
         .x = 0,
         .y = 0,
-        .faction = Faction::SYLVAN,
+        .faction = Faction::Sylvan,
     },
     CharacterDisplay {
         .name = "test2",
@@ -36,7 +36,7 @@ const CharacterDisplay characters[] = { CharacterDisplay {
         .wall_description = "wall test test test",
         .x = 0,
         .y = 0,
-        .faction = Faction::SYLVAN,
+        .faction = Faction::Sylvan,
     },
     CharacterDisplay {
         .name = "test3",
@@ -46,7 +46,7 @@ const CharacterDisplay characters[] = { CharacterDisplay {
         .wall_description = "wall test test test",
         .x = 0,
         .y = 0,
-        .faction = Faction::SYLVAN,
+        .faction = Faction::Sylvan,
     },
     CharacterDisplay {
         .name = "test4",
@@ -56,7 +56,7 @@ const CharacterDisplay characters[] = { CharacterDisplay {
         .wall_description = "wall test test test",
         .x = 0,
         .y = 0,
-        .faction = Faction::SYLVAN,
+        .faction = Faction::Sylvan,
     }
 };
 const size_t character_count = sizeof(characters) / sizeof(CharacterDisplay);

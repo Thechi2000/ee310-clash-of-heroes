@@ -1,10 +1,7 @@
 #pragma once
 #include "game.hpp"
 #include "units.hpp"
-
-enum class Faction {
-    SYLVAN
-};
+#include "army.hpp"
 
 class Character {
     class CharacterAbility {

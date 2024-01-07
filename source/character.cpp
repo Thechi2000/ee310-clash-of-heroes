@@ -2,9 +2,9 @@
 #include "sylvanBg.h"
 #include "sylvanUnits.h"
 
-class Sylvan : public Character {
+class SylvanCharacter : public Character {
 public:
-    Sylvan() : Character(
+    SylvanCharacter() : Character(
         sylvanUnitsTiles, sylvanUnitsTilesLen,
         sylvanUnitsPal, sylvanUnitsPalLen,
         sylvanBgBitmap, sylvanBgBitmapLen,
@@ -31,8 +31,8 @@ Character::Character(
 
 Character* Character::fromFaction(Faction faction) {
     switch (faction) {
-        case Faction::SYLVAN:
-            return new Sylvan();
+        case Faction::Sylvan:
+            return new SylvanCharacter();
         default:
             return nullptr;
     }
