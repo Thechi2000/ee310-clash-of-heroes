@@ -181,9 +181,14 @@ void Player::render() {
 
     consoleSelect(&console_);
     consoleClear();
+
     console_.cursorX = (sub_ ? 1 : 25);
     console_.cursorY = (sub_ ? 22 : 1);
     printf("%0.2ld:%0.2ld", time.minutes, time.seconds);
+
+    console_.cursorX = 10;
+    console_.cursorY = (sub_ ? 22 : 1);
+    printf("HP: %0.3ld/%0.3ld", currentHealth_, character_->maxHealth());
 
     // Enable the display after the first render
     if (sub_) {

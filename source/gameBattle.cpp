@@ -3,8 +3,8 @@
 #include <maxmod9.h>
 
 GameBattle::GameBattle(Faction firstPlayer, Faction secondPlayer) :
-    playerA_(firstPlayer, true),
-    playerB_(secondPlayer, false),
+    playerA_(firstPlayer, false),
+    playerB_(secondPlayer, true),
     playerAPlaying_(true) { }
 GameBattle::~GameBattle() { }
 
