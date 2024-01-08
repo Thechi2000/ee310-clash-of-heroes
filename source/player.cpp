@@ -140,11 +140,7 @@ void Player::render() {
 
                 bool isSelected = at(selectedUnit_.x, selectedUnit_.y) == at(x, y);
 
-                Vector position = { x * 28 + 16, y * 28 };
-                if (!sub_) {
-                    position.y = -position.y + 192;
-                }
-                if (isSelected) { position.y += 5; }
+                auto position = computeOnScreenCoordinates({ x, y }, isSelected);
 
                 auto spriteId = unit->getSpriteIdAt(relativePosition);
                 oamSet(
@@ -187,11 +183,8 @@ void Player::render() {
     }
 
 
-    Vector position = { selectedUnit_.x * 28 + 16, selectedUnit_.y * 28 };
-    if (!sub_) {
-        position.y = -position.y + 192;
-    }
     if (hasSelectedUnit() && at(selectedUnit_.x, selectedUnit_.y) == nullptr) {
+        auto position = computeOnScreenCoordinates(selectedUnit_, false);
         oamSet(
             oam(),
             127,
@@ -263,6 +256,8 @@ bool Player::handleInputs() {
             selectedUnit_.x++;
         }
     }
+    selectedUnit_.x = std::clamp(selectedUnit_.x, 0, 7);
+    selectedUnit_.y = std::clamp(selectedUnit_.y, 0, 5);
 
     if (keys & KEY_B) {
         selectedUnit_.x = -1;
@@ -434,3 +429,12 @@ void Player::startCoreUnitCharge(int battlefieldPosition) {
 }
 
 void Player::update() { }
+
+Vector Player::computeOnScreenCoordinates(const Vector& coord, bool selectedOffset) {
+    Vector position = { coord.x * 28 + 16, coord.y * 28 };
+    if (!sub_) {
+        position.y = -position.y + 155;
+    }
+    if (selectedOffset) { position.y += 5; }
+    return position;
+}

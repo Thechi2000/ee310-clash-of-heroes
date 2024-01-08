@@ -43,6 +43,8 @@ private:
     bool hasSelectedUnit() const;
     void startCoreUnitCharge(int battlefieldPosition);
 
+    Vector computeOnScreenCoordinates(const Vector& coord, bool selectedOffset);
+
     Character *character_;
     Army army_;
     BattleField battleField_;
