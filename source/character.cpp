@@ -4,6 +4,9 @@
 #include "havenBg.h"
 #include "havenUnits.h"
 
+#include "haven.hpp"
+#include "sylvan.hpp"
+
 class SylvanCharacter : public Character {
 public:
     SylvanCharacter() : Character(
@@ -14,6 +17,22 @@ public:
         100,
         20
     ) { }
+
+    virtual Unit* randomUnitFactory(Player* player) const {
+        int r = rand() % 12;
+
+        if (IN_RANGE(r, 0, 3)) {
+            return new sylvan::Bear(player, ColorType::ColorA);
+        } else if (IN_RANGE(r, 3, 6)) {
+            return new sylvan::Archer(player, ColorType::ColorB);
+        } else if (IN_RANGE(r, 6, 9)) {
+            return new sylvan::Nymph(player, ColorType::ColorC);
+        } else if (IN_RANGE(r, 9, 11)) {
+            return new sylvan::Deer(player, static_cast<ColorType>(rand() % 3));
+        } else {
+            return new sylvan::Drake(player, static_cast<ColorType>(rand() % 3));
+        }
+    }
 };
 
 class HavenCharacter : public Character {
@@ -26,6 +45,22 @@ public:
         100,
         20
     ) { }
+
+    virtual Unit* randomUnitFactory(Player* player) const {
+        int r = rand() % 12;
+
+        if (IN_RANGE(r, 0, 3)) {
+            return new haven::Swordsman(player, ColorType::ColorA);
+        } else if (IN_RANGE(r, 3, 6)) {
+            return new haven::Spearman(player, ColorType::ColorB);
+        } else if (IN_RANGE(r, 6, 9)) {
+            return new haven::Archer(player, ColorType::ColorC);
+        } else if (IN_RANGE(r, 9, 11)) {
+            return new haven::Knight(player, static_cast<ColorType>(rand() % 3));
+        } else {
+            return new haven::Angel(player, static_cast<ColorType>(rand() % 3));
+        }
+    }
 };
 
 Character::Character(

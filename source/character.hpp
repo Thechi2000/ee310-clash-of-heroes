@@ -21,6 +21,7 @@ public:
     static Character* fromFaction(Faction faction);
 
     int maxHealth() const { return maxHealth_; }
+    virtual Unit* randomUnitFactory(Player* player) const = 0;
 
     const void* spriteTiles;
     const size_t spriteTilesLen;

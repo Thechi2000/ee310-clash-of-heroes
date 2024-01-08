@@ -28,6 +28,12 @@ public:
     void handleDisparition(int battlefieldPosition);
     void updateBattleField();
 
+    /**
+     * Puts a unit at the given location.
+     * Returns whether the operation was successfull
+    */
+    bool putUnit(Unit* unit, const Vector& position);
+
     Unit *&at(int x, int y);
 
     void init();
@@ -36,6 +42,8 @@ private:
     OamState *oam() const;
     bool hasSelectedUnit() const;
     void startCoreUnitCharge(int battlefieldPosition);
+
+    Vector computeOnScreenCoordinates(const Vector& coord, bool selectedOffset);
 
     Character *character_;
     Army army_;
