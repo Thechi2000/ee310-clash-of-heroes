@@ -35,4 +35,5 @@ struct Army
     UnitType soldierC;
     UnitType specialA;
     UnitType specialB;
+    UnitType wall;
 };

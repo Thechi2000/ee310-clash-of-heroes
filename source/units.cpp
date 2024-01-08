@@ -101,3 +101,10 @@ void Unit::heal()
         health_ = std::min(maxCurrentHealth, health_ + heal);
     }
 }
+
+void Wall::onCombination(Wall* other, int otherBattlefieldPosition) {
+    int h = other->disappear();
+    delete other;
+    currentPlayer_->getAllyBattlefield()[otherBattlefieldPosition] = nullptr;
+    health_ = std::min(static_cast<float>(power_), health_ + h);
+}

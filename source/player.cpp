@@ -362,8 +362,6 @@ void Player::updateBattleField()
     while (isChanged)
     {
         bool isChanged = false;
-        BattleField newBattleField;
-        newBattleField.fill(nullptr);
 
         for (int x = 0; x < 8; ++x)
         {
@@ -379,9 +377,6 @@ void Player::updateBattleField()
                         if (u->getIsCharging())
                         {
                             // Core unit is charging + fusion
-                            newBattleField[8 * x + y + 0] = u;
-                            newBattleField[8 * x + y + 1] = u;
-                            newBattleField[8 * x + y + 2] = u;
                             y += 2;
 
                             // Core Unit fusion
@@ -393,30 +388,205 @@ void Player::updateBattleField()
                                 delete uF;
                                 isChanged = true;
                             }
-                        } else {
+                        }
+                        else
+                        {
                             // Core Unit to wall
-                            if (newBattleField[8 * x + y] == nullptr && x < 6 && u->isEqual(battleField_[8 * x + y + 8]) && u->isEqual(battleField_[8 * x + y + 16])) {
+                            if (x < 6 && u->isEqual(battleField_[8 * x + y + 8]) && u->isEqual(battleField_[8 * x + y + 16]))
+                            {
                                 int i = x;
-                                while (i < 8 && u->isEqual(newBattleField[8 * i + y])) {
-                                    newBattleField[8 * i + y] = new HavenWall(this);
+                                while (i < 8 && u->isEqual(battleField_[8 * i + y]))
+                                {
+                                    delete u;
+                                    battleField_[8 * i + y] = new HavenWall(this);
                                 }
                             }
 
-                            // Core Unit 
+                            // Core unit to charge
+                            if (y < 4 && u->isEqual(battleField_[8 * x + y + 1]) && u->isEqual(battleField_[8 * x + y + 2]))
+                            {
+                                startCoreUnitCharge(8 * x + y);
+                                y += 2;
+                            }
                         }
-
-                        
+                    }
+                    if ((uT == army_.specialA || uT == army_.specialB) && (y < 3))
+                    {
+                        Vector size = u->getSize();
+                        Unit *u1 = battleField_[8 * x + y + 2];
+                        Unit *u2 = battleField_[8 * x + y + 3];
+                        if (u1 != nullptr && u1->isEqual(u2) && u->getColor() == u1->getColor() && u1 != u2)
+                        {
+                            // Elite Unit
+                            if (size.x == 1)
+                            {
+                                delete u1;
+                                delete u2;
+                                battleField_[8 * x + y + 2] = nullptr;
+                                battleField_[8 * x + y + 3] = nullptr;
+                                u->onTransformToAttack();
+                                isChanged = true;
+                            }
+                            // Champion Unit
+                            if (size.x == 2)
+                            {
+                                Unit *u3 = battleField_[8 * x + y + 8 + 2];
+                                Unit *u4 = battleField_[8 * x + y + 8 + 3];
+                                if (u1->isEqual(u3) && u->getColor() == u3->getColor() && u3 != u4)
+                                {
+                                    delete u1;
+                                    delete u2;
+                                    delete u3;
+                                    delete u4;
+                                    battleField_[8 * x + y + 2] = nullptr;
+                                    battleField_[8 * x + y + 3] = nullptr;
+                                    battleField_[8 * x + y + 8 + 2] = nullptr;
+                                    battleField_[8 * x + y + 8 + 3] = nullptr;
+                                    u->onTransformToAttack();
+                                    isChanged = true;
+                                }
+                            }
+                        }
+                        y += 2;
+                    }
+                    if (uT == army_.wall)
+                    {
+                        Unit *uW = battleField_[8 * x + y + 1];
+                        if (uW != nullptr && uW->getType() == uT)
+                        {
+                            static_cast<Wall *>(u)->onCombination(static_cast<Wall *>(uW), 8 * x + y + 1);
+                            isChanged = true;
+                            y += 1;
+                        }
                     }
                 }
+            }
+        }
+
+        // Move units if necessery
+        for (int x = 0; x < 8; ++x)
+        {
+            Unit *arr[6] = {nullptr};
+
+            // Filling with champion unit needed
+            if (x > 0)
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    if (battleField_[8 * x + j - 8] != nullptr && battleField_[8 * x + j - 8]->getSize().x == 2)
+                    {
+                        if (x == 1)
+                        {
+                            arr[j] = battleField_[8 * x + j - 8];
+                        }
+                        else if (battleField_[8 * x + j - 8] != battleField_[8 * x + j - 16])
+                        {
+                            arr[j] = battleField_[8 * x + j - 8];
+                        }
+                    }
+                }
+            }
+
+            int i = 0;
+            int j = 0;
+
+            // Place Walls
+            while (j < 6)
+            {
+                if (battleField_[8 * x + j] != nullptr && battleField_[8 * x + j]->getType() == army_.wall)
+                {
+                    if (i < 6)
+                    {
+                        arr[i] = battleField_[8 * x + j];
+                        i += (i == 5 || arr[i + 1] == nullptr) ? 1 : 3;
+                        isChanged = true;
+                    }
+                }
+                j++;
+            }
+
+            // Place Charging Units
+            j = 0;
+            while (j < 6)
+            {
+                Unit *uM = battleField_[8 * x + j];
+                if (uM != nullptr && uM->getIsCharging())
+                {
+                    // Core Unit Type
+                    if (uM->getType() == army_.soldierA || uM->getType() == army_.soldierB || uM->getType() == army_.soldierC)
+                    {
+                        while (i < 4 && arr[i] != nullptr && arr[i + 1] != nullptr && arr[i+2] != nullptr) {
+                            i += 1;
+                        }
+
+                        if (i < 4 && arr[i] != nullptr && arr[i + 1] != nullptr && arr[i+2] != nullptr)
+                        {
+                            arr[i] = uM;
+                            arr[i + 1] = uM;
+                            arr[i + 2] = uM;
+                        }
+                        j += 2;
+                        isChanged = true;
+                    }
+
+                    // Elite and Champion Unit Type
+                    if (uM->getSize().y == 2)
+                    {
+                        while (i < 5 && arr[i] != nullptr && arr[i + 1] != nullptr) {
+                            i += 1;
+                        }
+
+                        if (i < 5 && arr[i] != nullptr && arr[i + 1] != nullptr)
+                        {
+                            arr[i] = uM;
+                            arr[i + 1] = uM;
+                        }
+                        j += 1;
+                        isChanged = true;
+                    }
+
+                    while (i < 6 && arr[i] != nullptr) {
+                        ++i;
+                    }
+                }
+                j++;
+            }
+
+            j = 0;
+            while (i < 6 && j < 6)
+            {
+                if (battleField_[8 * x + j] != nullptr && !battleField_[8 * x + j]->getIsCharging() && !(battleField_[8 * x + j]->getType() == army_.wall))
+                {
+                    if (battleField_[8 * x + j]->getSize().y == 1) {
+                        // Core non charging units
+                        arr[i] = battleField_[8 * x + j];
+                        isChanged = true;
+                    } else {
+                        // Elite and Champion non charging units
+                        if (j < 5 && i < 5) {
+                            arr[i] = battleField_[8 * x + j];
+                            arr[i+1] = battleField_[8 * x + j + 1];
+                        }
+                        isChanged = true;
+                        j++;
+                    }
+                }
+            }
+
+            // Copying the result in the original battlefield
+            for (int y = 0; y < 6; ++y) {
+                battleField_[8 * x + y] = arr[y];
             }
         }
     }
 }
 
-void Player::startCoreUnitCharge(int battlefieldPosition) {
-    int y = battlefieldPosition%6;
-    Unit* u = battleField_[battlefieldPosition];
-    if (battlefieldPosition > 3 || u == nullptr || !u->isEqual(battleField_[battlefieldPosition + 1]) || !u->isEqual(battleField_[battlefieldPosition + 2])) {
+void Player::startCoreUnitCharge(int battlefieldPosition)
+{
+    int y = battlefieldPosition % 6;
+    Unit *u = battleField_[battlefieldPosition];
+    if (battlefieldPosition > 3 || u == nullptr || !u->isEqual(battleField_[battlefieldPosition + 1]) || !u->isEqual(battleField_[battlefieldPosition + 2]))
+    {
         return;
     }
 

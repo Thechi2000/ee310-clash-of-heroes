@@ -108,7 +108,7 @@ class Wall : public Unit
 public:
     virtual void onCreation(){};
     virtual void onDestroy(){};
-    virtual void onCombination(){};
+    virtual void onCombination(Wall* other, int otherBattleFieldPosition);
 
 protected:
     /* Power : Max health / Toughness : Initial health */
