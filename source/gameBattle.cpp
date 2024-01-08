@@ -6,13 +6,13 @@ GameBattle::GameBattle() {
 }
 
 void GameBattle::render() {
-    playerA_.render();
-    playerB_.render();
+    playerA_->render();
+    playerB_->render();
 }
 
 GameState* GameBattle::handle_inputs() {
-    playerA_.handleInputs();
-    playerB_.handleInputs();
+    playerA_->handleInputs();
+    playerB_->handleInputs();
 
     return nullptr;
 }

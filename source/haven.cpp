@@ -13,10 +13,8 @@ int Spearman::attack(BattleField &opponentBattlefield, int attackedColumn)
     int i = 8 * attackedColumn;
     while (damage < health_ && i < 8)
     {
-        Unit *u = opponentBattlefield[i];
-        damage = u->disappear();
-        delete u;
-        opponentBattlefield[i] = nullptr;
+        damage = opponentBattlefield.units[i]->disappear();
+        handleDisparition(i, opponentBattlefield);
         ++i;
     }
 
@@ -41,21 +39,15 @@ bool Knight::updateCharge()
 
 bool Angel::updateCharge()
 {
-    bool ignore[48] = { false };
+    BattleField* allyBattlefield = currentPlayer_->getAllyBattlefield();
 
     for (int i = 0; i < 8 * 6; ++i)
     {
-        if (!ignore[i])
+        if (allyBattlefield->unitTypes[i] <= CoreCharging_F && allyBattlefield->unitTypes[i] != None)
         {
-            Unit *u = currentBattleField_[i];
-            u->heal();
-
-            Vector s = u->getSize();
-            for (int x = 0; x < s.x; x++) {
-                for (int y = 0; y < s.y; y++) {
-                    ignore[i + y + 8 * x] = true;
-                }
-            }
+            allyBattlefield->units[i]->heal();
         }
     }
+
+    return Unit::updateCharge();
 }

@@ -1,8 +1,13 @@
+#pragma once
 #include "game.hpp"
 #include "character.hpp"
 #include "army.hpp"
 #include "units.hpp"
 #include <vector>
+
+struct BattleField;
+class Unit;
+class Character;
 
 class Player {
 public:
@@ -13,6 +18,9 @@ public:
 
     void render();
     void handleInputs();
+
+    BattleField* getAllyBattlefield() { return battleField_; }
+    BattleField* getEnnemiBattlefield() { return opponent_->getAllyBattlefield(); }
 
     Unit*& at(int x, int y);
 
@@ -27,7 +35,7 @@ private:
 
     Character character_;
     Army army_;
-    BattleField battleField_;
+    BattleField* battleField_;
 
     int currentHealth_;
     int invocableUnits_;
@@ -39,6 +47,7 @@ private:
     std::vector<u16*> spritesGfx_;
 
     bool me_; // false if it's the opponent
+    Player* opponent_;
 
     PrintConsole console_;
 };

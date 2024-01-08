@@ -8,7 +8,7 @@ class TestUnit : public Unit {
 public:
     virtual ~TestUnit() { }
 
-    TestUnit(int x, int y, int spriteId) : Unit(x, y, 3, 6, 4, spriteId) { }
+    TestUnit(int x, int y, Player* player, int spriteId) : Unit(x, y, 3, 6, 4, player, spriteId) { }
 
     void onTransformToAttack() { }
     void onTransformToWall() { }
@@ -16,7 +16,7 @@ public:
 };
 
 Player::Player() : selectedUnit_{ -1, -1 } {
-    battleField_.fill(nullptr);
+    battleField_->units.fill(nullptr);
 
     // TODO REMOVE
     static bool isMe = false;
@@ -24,7 +24,7 @@ Player::Player() : selectedUnit_{ -1, -1 } {
     isMe = true;
 
     for (int i = 0; i < 48; ++i) {
-        battleField_[i] = new TestUnit(1, 1, i % 9);
+        battleField_->units[i] = new TestUnit(1, 1, this, i % 9);
     }
     // END REMOVE
 
@@ -84,7 +84,7 @@ Player::Player() : selectedUnit_{ -1, -1 } {
 }
 
 Unit*& Player::at(int x, int y) {
-    return battleField_[x + 8 * y];
+    return battleField_->units[x + 8 * y];
 }
 
 OamState* Player::oam() const {
@@ -208,8 +208,8 @@ void Player::handleInputs() {
 void Player::update() { }
 
 Player::~Player() {
-    for (size_t i = 0; i < battleField_.size(); ++i) {
-        auto unit = battleField_[i];
+    for (size_t i = 0; i < battleField_->units.size(); ++i) {
+        auto unit = battleField_->units[i];
 
         if (unit != nullptr) {
             for (size_t x = 0; x < unit->getSize().x; ++x) {

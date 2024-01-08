@@ -1,41 +1,89 @@
 #include "units.hpp"
 #include <cmath>
 #include <array>
+#include "player.hpp"
 
-int Unit::disappear() {
+void handleDisparition(int battlefieldPosition, BattleField &battleField) {
+    UnitType uT = battleField.unitTypes[battlefieldPosition];
+
+    if (uT == None) {
+        return;
+    }
+    if (uT < SubUnits) {
+        for (int i = battleField.units[battlefieldPosition]->getSize().y - 1; i >= 0; i--) {
+            for (int j = battleField.units[battlefieldPosition]->getSize().x - 1; j >= 0; j--) {
+                battleField.unitTypes[battlefieldPosition + i + 8*j] = None;
+                delete battleField.units[battlefieldPosition + i + 8*j];
+                battleField.units[battlefieldPosition + i + 8*j] = nullptr;
+            }
+        }
+        return;
+    }
+    if (uT == CoreCharging_F) {
+        delete battleField.units[battlefieldPosition];
+        for (int i = 0; i < 3; ++i) {
+            battleField.unitTypes[battlefieldPosition + i] = None;
+            battleField.units[battlefieldPosition + i] = nullptr;
+        }
+    }
+    if (uT == CoreCharging_B || uT == Elite_B || uT == Champion_LB) {
+        return handleDisparition(battlefieldPosition - 1, battleField);
+    }
+    if (uT == CoreCharging_BB) {
+        return handleDisparition(battlefieldPosition - 2, battleField);
+    }
+    if (uT == Champion_RF) {
+        return handleDisparition(battlefieldPosition - 8, battleField);
+    }
+    if (uT == Champion_RB) {
+        return handleDisparition(battlefieldPosition - 9, battleField);
+    }
+
+}
+
+int Unit::disappear()
+{
     return std::round(health_);
 }
 
-void Unit::onTransformToAttack() {
+void Unit::onTransformToAttack()
+{
     is_charging_ = true;
 }
 
-bool Unit::updateCharge() {
-    if (!is_charging_) {
+bool Unit::updateCharge()
+{
+    if (!is_charging_)
+    {
         return false;
     }
-    
+
     health_ = (power_ - toughness_) / charge_;
     remainingChargeTurns_ -= 1;
 
-    if (!remainingChargeTurns_) {
+    if (!remainingChargeTurns_)
+    {
         std::round(health_);
         return true;
     }
     return false;
 }
 
-int Unit::attack(BattleField& opponentBattlefield, int attackedColumn) {
-    if (!is_charging_) {
+int Unit::attack(BattleField &opponentBattlefield, int attackedColumn)
+{
+    if (!is_charging_)
+    {
         return 0;
     }
 
     int i = 8 * attackedColumn;
-    while (health_ > 0 && i < 8) {
-        Unit* u = opponentBattlefield[i];
-        health_ -= u->disappear();
-        delete u;
-        opponentBattlefield[i] = nullptr;
+    while (health_ > 0 && i < 8)
+    {
+        Unit *u = opponentBattlefield.units[i];
+        if (!u) {
+            health_ -= u->disappear();
+            handleDisparition(i, opponentBattlefield);
+        }
         ++i;
     }
 
@@ -44,21 +92,26 @@ int Unit::attack(BattleField& opponentBattlefield, int attackedColumn) {
     return std::max(std::round(health_), 0.0f);
 }
 
-int ChampionUnit::attack(BattleField& opponentBattlefield, int attackedColumn) {
-    if (!is_charging_) {
+int ChampionUnit::attack(BattleField &opponentBattlefield, int attackedColumn)
+{
+    if (!is_charging_)
+    {
         return 0;
     }
 
     int i = 8 * attackedColumn;
-    while (health_ > 0 && i < 8) {
-        Unit* u1 = opponentBattlefield[i];
-        health_ -= u1->disappear();
-        Unit* u2 = opponentBattlefield[i + 8];
-        health_ -= u2->disappear();
-        delete u1;
-        delete u2;
-        opponentBattlefield[i] = nullptr;
-        opponentBattlefield[i + 8] = nullptr;
+    while (health_ > 0 && i < 8)
+    {
+        Unit *u1 = opponentBattlefield.units[i];
+        if (!u1) {
+            health_ -= u1->disappear();
+            handleDisparition(i, opponentBattlefield);
+        }
+        Unit *u2 = opponentBattlefield.units[i + 8];
+        if (!u2) {
+            health_ -= u2->disappear();
+            handleDisparition(i + 8, opponentBattlefield);
+        }
         ++i;
     }
 
@@ -67,9 +120,13 @@ int ChampionUnit::attack(BattleField& opponentBattlefield, int attackedColumn) {
     return std::max(std::round(health_), 0.0f);
 }
 
-void Unit::heal() {
-    float maxCurrentHealth = (power_ - toughness_) * (1 - remainingChargeTurns_ / charge_);
-    float heal = (power_ - toughness_) / charge_;
+void Unit::heal()
+{
+    if (is_charging_)
+    {
+        float maxCurrentHealth = (power_ - toughness_) * (1 - remainingChargeTurns_ / charge_);
+        float heal = (power_ - toughness_) / charge_;
 
-    health_ = std::min(maxCurrentHealth, health_ + heal);
+        health_ = std::min(maxCurrentHealth, health_ + heal);
+    }
 }

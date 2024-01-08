@@ -1,9 +1,20 @@
 #pragma once
 #include "game.hpp"
+#include "gameBattle.hpp"
+#include "army.hpp"
 #include <array>
 
 class Unit;
-typedef std::array<Unit *, 48> BattleField; // 8 columns of 6-tile units
+class Player;
+
+// 8 columns of 6-tile units
+typedef struct BattleField {
+    std::array<UnitType, 48> unitTypes;
+    std::array<Unit *, 48> units;
+};
+
+// Return next index to consider
+void handleDisparition(int battlefieldPosition, BattleField &battleField);
 
 // ---------------------------------------------------------------------- //
 
@@ -42,8 +53,8 @@ public:
     }
 
 protected:
-    Unit(int width, int length, int charge, int power, int toughness, BattleField &currentBattleField, int spriteId) : Unit({.x = width, .y = length}, charge, power, toughness, currentBattleField, spriteId) {}
-    Unit(Vector size, int charge, int power, int toughness, BattleField &currentBattleField, int spriteId) : size_(size), charge_(charge), power_(power), toughness_(toughness), health_(toughness), currentBattleField_(currentBattleField), spriteId_(spriteId) {}
+    Unit(int width, int length, int charge, int power, int toughness, Player* currentPlayer, int spriteId) : Unit({.x = width, .y = length}, charge, power, toughness, currentPlayer, spriteId) {}
+    Unit(Vector size, int charge, int power, int toughness, Player* currentPlayer, int spriteId) : size_(size), charge_(charge), power_(power), toughness_(toughness), health_(toughness), currentPlayer_(currentPlayer), spriteId_(spriteId) {}
 
     Vector size_;
 
@@ -59,13 +70,13 @@ protected:
 
     int spriteId_;
 
-    BattleField currentBattleField_;
+    Player* currentPlayer_;
 };
 
 class SpecialUnit : public Unit
 {
 protected:
-    SpecialUnit(int width, int charge, int power, int toughness, BattleField &currentBattleField, int spriteId) : Unit(width, 2, charge, power, toughness, currentBattleField, spriteId){};
+    SpecialUnit(int width, int charge, int power, int toughness, Player* currentPlayer, int spriteId) : Unit(width, 2, charge, power, toughness, currentPlayer, spriteId){};
 };
 
 // ---------------------------------------------------------------------- //
@@ -73,13 +84,13 @@ protected:
 class CoreUnit : public Unit
 {
 protected:
-    CoreUnit(int charge, int power, int toughness, BattleField &currentBattleField, int spriteId) : Unit(1, 1, charge, power, toughness, currentBattleField, spriteId){};
+    CoreUnit(int charge, int power, int toughness, Player* currentPlayer, int spriteId) : Unit(1, 1, charge, power, toughness, currentPlayer, spriteId){};
 };
 
 class EliteUnit : public SpecialUnit
 {
 protected:
-    EliteUnit(int charge, int power, int toughness, BattleField &currentBattleField, int spriteId) : SpecialUnit(1, charge, power, toughness, currentBattleField, spriteId){};
+    EliteUnit(int charge, int power, int toughness, Player* currentPlayer, int spriteId) : SpecialUnit(1, charge, power, toughness, currentPlayer, spriteId){};
 };
 
 class ChampionUnit : public SpecialUnit
@@ -88,7 +99,7 @@ public:
     virtual int attack(BattleField &opponentBattlefield, int attackedColumn);
 
 protected:
-    ChampionUnit(int charge, int power, int toughness, BattleField &currentBattleField, int spriteId) : SpecialUnit(2, charge, power, toughness, currentBattleField, spriteId){};
+    ChampionUnit(int charge, int power, int toughness, Player* currentPlayer, int spriteId) : SpecialUnit(2, charge, power, toughness, currentPlayer, spriteId){};
 };
 
 // ---------------------------------------------------------------------- //
@@ -102,9 +113,5 @@ public:
 
 protected:
     /* Power : Max health / Toughness : Initial health */
-    Wall(Sprite weakWalls, Sprite strongWalls, int health, BattleField &currentBattleField, int spriteId) : Unit(1, 1, 0, health * 2, health, currentBattleField, spriteId), weakWalls_(weakWalls), strongWalls_(strongWalls) {}
-
-private:
-    Sprite weakWalls_;
-    Sprite strongWalls_;
+    Wall(int health, Player* currentPlayer, int spriteId) : Unit(1, 1, 0, health * 2, health, currentPlayer, spriteId) {}
 };
