@@ -13,8 +13,10 @@ Player& GameBattle::currentPlayer() {
 }
 
 void GameBattle::init() {
+    // Reset the timer to match with game time
     resetTime();
 
+    // Load the music and sound effects
     mmLoad(MOD_BATTLE);
     mmLoadEffect(SFX_BATTLE_ENEMY_HIT);
     mmLoadEffect(SFX_BATTLE_UNIT_APPEARING);
@@ -24,12 +26,15 @@ void GameBattle::init() {
     mmLoadEffect(SFX_BATTLE_WALL_HIT);
     mmLoadEffect(SFX_BATTLE_WALL_KILLED);
 
+    // Start the battle music
     mmStart(MOD_BATTLE, MM_PLAY_LOOP);
 
+    // Init both player's screens
     playerA_.init();
     playerB_.init();
 }
 void GameBattle::deinit() {
+    // Unload the battle's music and sound effects
     mmUnload(MOD_BATTLE);
     mmUnloadEffect(SFX_BATTLE_ENEMY_HIT);
     mmUnloadEffect(SFX_BATTLE_UNIT_APPEARING);
@@ -46,14 +51,8 @@ void GameBattle::render() {
 }
 
 GameState* GameBattle::handle_inputs() {
-    bool turnCompleted = false;
-    if (playerAPlaying_) {
-        turnCompleted = playerA_.handleInputs();
-    } else {
-        turnCompleted = playerB_.handleInputs();
-    }
-
-    if (turnCompleted) {
+    // Make the current player handle the inputs, and switch the turn to the other player if he as finished
+    if (currentPlayer().handleInputs()) {
         playerAPlaying_ = !playerAPlaying_;
     }
 

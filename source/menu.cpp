@@ -76,14 +76,14 @@ void drawCharacter(int id, int x, int y) {
     }
 }
 
-CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displayed_character(-1) { }
+CharacterSelectionMenu::CharacterSelectionMenu() : selectedCharacter_(0), displayedCharacter_(-1) { }
 CharacterSelectionMenu::~CharacterSelectionMenu() { }
 
 void CharacterSelectionMenu::init() {
     VRAM_A_CR = VRAM_ENABLE | VRAM_A_MAIN_BG;
     REG_DISPCNT = MODE_3_2D | DISPLAY_BG3_ACTIVE;
     BGCTRL[3] = BG_BMP_BASE(1) | BG_BMP8_256x256;
-    consoleInit(&main_printer, 2, BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);
+    consoleInit(&mainPrinter_, 2, BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);
 
     for (int i = 0; i < abilities_menu_backgroundBitmapLen; ++i) {
         BG_BMP_RAM(1)[i] = ((u16*)abilities_menu_backgroundBitmap)[i] | 0x1010;
@@ -102,7 +102,7 @@ void CharacterSelectionMenu::init() {
     VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
 
     REG_DISPCNT_SUB = MODE_0_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE;
-    consoleInit(&sub_printer, 1, BgType_Text4bpp, BgSize_T_256x256, 8, 0, false, true);
+    consoleInit(&subPrinter_, 1, BgType_Text4bpp, BgSize_T_256x256, 8, 0, false, true);
     BGCTRL_SUB[2] = BG_TILE_BASE(4) | BG_MAP_BASE(16) | BG_32x32 | BG_COLOR_256;
     BGCTRL_SUB[3] = BG_TILE_BASE(8) | BG_MAP_BASE(24) | BG_32x32 | BG_COLOR_256;
 
@@ -121,32 +121,20 @@ void CharacterSelectionMenu::init() {
     mmSetModuleVolume(256);
 }
 void CharacterSelectionMenu::deinit() {
-    VRAM_A_CR = 0;
-    REG_DISPCNT = 0;
-    BGCTRL[2] = 0;
-    BGCTRL[3] = 0;
-
-    VRAM_C_CR = 0;
-    REG_DISPCNT_SUB = 0;
-    BGCTRL_SUB[0] = 0;
-    BGCTRL_SUB[1] = 0;
-    BGCTRL_SUB[2] = 0;
-    BGCTRL_SUB[3] = 0;
-
     mmUnload(MOD_MENU);
     mmUnloadEffect(SFX_MENU_SELECT);
     mmUnloadEffect(SFX_MENU_SWAP);
 }
 
 void CharacterSelectionMenu::render() {
-    if (displayed_character != selected_character) {
-        auto character = &characters[selected_character];
+    if (displayedCharacter_ != selectedCharacter_) {
+        auto character = &characters[selectedCharacter_];
 
-        drawCharacter(CLAMP_CHARACTER_ID(selected_character - 1), -2, 5);
-        drawCharacter(CLAMP_CHARACTER_ID(selected_character + 1), 22, 5);
-        drawCharacter(selected_character, 8, 2);
+        drawCharacter(CLAMP_CHARACTER_ID(selectedCharacter_ - 1), -2, 5);
+        drawCharacter(CLAMP_CHARACTER_ID(selectedCharacter_ + 1), 22, 5);
+        drawCharacter(selectedCharacter_, 8, 2);
 
-        consoleSelect(&main_printer);
+        consoleSelect(&mainPrinter_);
 
         printf(
             "\x1B[32m\033[3;4H%s\033[5;3H%s\033[14;4H%s\033[16;3H%s",
@@ -156,11 +144,11 @@ void CharacterSelectionMenu::render() {
             character->wall_description
         );
 
-        consoleSelect(&sub_printer);
+        consoleSelect(&subPrinter_);
         printf("\x1B[32m\033[19;12H%s", character->name);
         printf("\x1B[32m\033[0;12HPlayer %s", firstPlayerFaction_.has_value() ? "2" : "1");
 
-        displayed_character = selected_character;
+        displayedCharacter_ = selectedCharacter_;
     }
 }
 
@@ -169,22 +157,22 @@ GameState* CharacterSelectionMenu::handle_inputs() {
 
     if (keys & KEY_RIGHT) {
         mmEffect(SFX_MENU_SWAP);
-        selected_character++;
+        selectedCharacter_++;
     } else if (keys & KEY_LEFT) {
         mmEffect(SFX_MENU_SWAP);
-        selected_character--;
+        selectedCharacter_--;
     } else if (keys & KEY_A) {
         mmEffect(SFX_MENU_SELECT);
         return confirmSelection();
     } else if (keys & KEY_B) {
         if (secondPlayerFaction_.has_value()) {
             secondPlayerFaction_ = {};
-            displayed_character = -1;
-            selected_character = 0;
+            displayedCharacter_ = -1;
+            selectedCharacter_ = 0;
         } else if (firstPlayerFaction_.has_value()) {
             firstPlayerFaction_ = {};
-            displayed_character = -1;
-            selected_character = 0;
+            displayedCharacter_ = -1;
+            selectedCharacter_ = 0;
         }
     }
 
@@ -196,23 +184,23 @@ GameState* CharacterSelectionMenu::handle_inputs() {
             return confirmSelection();
         } else if (IN_RANGE(y, 80, 207)) {
             if (IN_RANGE(x, 0, 111)) {
-                selected_character--;
+                selectedCharacter_--;
             } else if (IN_RANGE(x, 176, 255)) {
-                selected_character++;
+                selectedCharacter_++;
             }
         }
     }
 
-    selected_character = CLAMP_CHARACTER_ID(selected_character);
+    selectedCharacter_ = CLAMP_CHARACTER_ID(selectedCharacter_);
 
     return nullptr;
 }
 
 GameState* CharacterSelectionMenu::confirmSelection() {
-    (firstPlayerFaction_.has_value() ? secondPlayerFaction_ : firstPlayerFaction_) = characters[selected_character].faction;
+    (firstPlayerFaction_.has_value() ? secondPlayerFaction_ : firstPlayerFaction_) = characters[selectedCharacter_].faction;
 
-    displayed_character = -1;
-    selected_character = 0;
+    displayedCharacter_ = -1;
+    selectedCharacter_ = 0;
 
     return (firstPlayerFaction_.has_value() && secondPlayerFaction_.has_value()) ? new GameBattle(firstPlayerFaction_.value(), secondPlayerFaction_.value()) : nullptr;
 }

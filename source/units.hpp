@@ -28,19 +28,17 @@ public:
 
     virtual ~Unit() { }
 
-    /* Returns true if the unit attacks */
+    /**
+     *  Returns true if the unit attacks
+    */
     virtual bool updateCharge();
-    /* Returns the damage dealt to the ennemi player*/
 
+    /**
+     *  Returns the damage dealt to the enemy player
+    */
     virtual int attack(BattleField& opponentBattlefield, int attackedColumn);
 
-    int getSpriteIdAt(const Vector& position) {
-        if (!IN_RANGE(position.x, 0, size_.x - 1) || !IN_RANGE(position.y, 0, size_.y - 1)) {
-            return -1;
-        } else {
-            return spriteId_ + static_cast<int>(colorType_) * size_.x * size_.y + position.x * size_.y + position.y;
-        }
-    }
+    int getSpriteIdAt(const Vector& position);
 
 protected:
     Unit(int width, int length, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) :

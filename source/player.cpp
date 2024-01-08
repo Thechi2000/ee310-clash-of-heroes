@@ -43,9 +43,7 @@ void Player::init() {
         REG_DISPCNT_SUB = 0; // Disable the display to avoid clutter on the screen while loading the different assets
         BGCTRL_SUB[2] = BG_BMP_BASE(4) | BgSize_B8_256x256 | BG_PRIORITY_3;
 
-        mdCopy(BG_BMP_RAM_SUB(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8* array) {
-            while (array[i] == 255) { i--; }
-            return array[i]; });
+        cpy(BG_BMP_RAM_SUB(4), character_->bgBmp, character_->bgBmpLen, { 255 });
         dmaCopy(character_->bgPal, BG_PALETTE_SUB, character_->bgPalLen);
         BG_PALETTE_SUB[255] = ARGB16(1, 28, 60, 28);
 
@@ -63,9 +61,7 @@ void Player::init() {
         REG_DISPCNT = 0; // Disable the display to avoid clutter on the screen while loading the different assets
         BGCTRL[2] = BG_BMP_BASE(4) | BgSize_B8_256x256 | BG_PRIORITY_3;
 
-        mdCopy(BG_BMP_RAM(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8* array) {
-            while (array[i] == 255) { i--; }
-            return array[i]; });
+        cpy(BG_BMP_RAM(4), character_->bgBmp, character_->bgBmpLen, { 255 });
         dmaCopy(character_->bgPal, BG_PALETTE, character_->bgPalLen);
         BG_PALETTE[255] = ARGB16(1, 28, 60, 28);
 
@@ -216,7 +212,7 @@ void Player::render() {
 
     console_.cursorX = 10;
     console_.cursorY = (sub_ ? 22 : 1);
-    printf("HP: %0.3ld/%0.3ld", currentHealth_, character_->maxHealth());
+    printf("HP: %0.3d/%0.3d", currentHealth_, character_->maxHealth());
 
     // Enable the display after the first render
     if (sub_) {

@@ -21,6 +21,10 @@ public:
     static Character* fromFaction(Faction faction);
 
     int maxHealth() const { return maxHealth_; }
+
+    /**
+     *  Instanciate a random unit from the character's army
+     */
     virtual Unit* randomUnitFactory(Player* player) const = 0;
 
     const void* spriteTiles;

@@ -3,13 +3,11 @@
 #include <array>
 #include "player.hpp"
 
-int Unit::disappear()
-{
+int Unit::disappear() {
     return std::round(health_);
 }
 
-void Unit::onTransformToAttack()
-{
+void Unit::onTransformToAttack() {
     isCharging_ = true;
     fusion_ = 1;
 }
@@ -19,37 +17,30 @@ void Unit::onFusion(Unit* fusionUnit) {
     health_ += fusionUnit->disappear();
 }
 
-bool Unit::updateCharge()
-{
-    if (!isCharging_)
-    {
+bool Unit::updateCharge() {
+    if (!isCharging_) {
         return false;
     }
 
     health_ += fusion_ * (power_ - toughness_) / charge_;
     remainingChargeTurns_ -= 1;
 
-    if (!remainingChargeTurns_)
-    {
+    if (!remainingChargeTurns_) {
         std::round(health_);
         return true;
     }
     return false;
 }
 
-int Unit::attack(BattleField &opponentBattlefield, int attackedColumn)
-{
-    if (!isCharging_)
-    {
+int Unit::attack(BattleField& opponentBattlefield, int attackedColumn) {
+    if (!isCharging_) {
         return 0;
     }
 
     int i = 8 * attackedColumn;
-    while (health_ > 0 && i < 8)
-    {
-        Unit *u = opponentBattlefield[i];
-        if (u != nullptr)
-        {
+    while (health_ > 0 && i < 8) {
+        Unit* u = opponentBattlefield[i];
+        if (u != nullptr) {
             health_ -= u->disappear();
             currentPlayer_->getEnnemy()->handleDisparition(i);
         }
@@ -61,25 +52,28 @@ int Unit::attack(BattleField &opponentBattlefield, int attackedColumn)
     return std::max(std::round(health_), 0.0f);
 }
 
-int ChampionUnit::attack(BattleField &opponentBattlefield, int attackedColumn)
-{
-    if (!isCharging_)
-    {
+int Unit::getSpriteIdAt(const Vector& position) {
+    if (!IN_RANGE(position.x, 0, size_.x - 1) || !IN_RANGE(position.y, 0, size_.y - 1)) {
+        return -1;
+    } else {
+        return spriteId_ + static_cast<int>(colorType_) * size_.x * size_.y + position.x * size_.y + position.y;
+    }
+}
+
+int ChampionUnit::attack(BattleField& opponentBattlefield, int attackedColumn) {
+    if (!isCharging_) {
         return 0;
     }
 
     int i = 8 * attackedColumn;
-    while (health_ > 0 && i < 8)
-    {
-        Unit *u1 = opponentBattlefield[i];
-        if (u1 != nullptr)
-        {
+    while (health_ > 0 && i < 8) {
+        Unit* u1 = opponentBattlefield[i];
+        if (u1 != nullptr) {
             health_ -= u1->disappear();
             currentPlayer_->getEnnemy()->handleDisparition(i);
         }
-        Unit *u2 = opponentBattlefield[i + 8];
-        if (u2 != nullptr)
-        {
+        Unit* u2 = opponentBattlefield[i + 8];
+        if (u2 != nullptr) {
             health_ -= u2->disappear();
             currentPlayer_->getEnnemy()->handleDisparition(i + 8);
         }
@@ -91,10 +85,8 @@ int ChampionUnit::attack(BattleField &opponentBattlefield, int attackedColumn)
     return std::max(std::round(health_), 0.0f);
 }
 
-void Unit::heal()
-{
-    if (isCharging_)
-    {
+void Unit::heal() {
+    if (isCharging_) {
         float maxCurrentHealth = fusion_ * (power_ - toughness_) * (1 - remainingChargeTurns_ / charge_);
         float heal = fusion_ * (power_ - toughness_) / charge_;
 

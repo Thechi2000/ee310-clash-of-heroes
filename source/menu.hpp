@@ -19,10 +19,10 @@ public:
 private:
     GameState* confirmSelection();
 
-    int displayed_character;
-    int selected_character;
+    int displayedCharacter_;
+    int selectedCharacter_;
 
-    PrintConsole main_printer, sub_printer;
+    PrintConsole mainPrinter_, subPrinter_;
 
     std::optional<Faction> firstPlayerFaction_;
     std::optional<Faction> secondPlayerFaction_;
