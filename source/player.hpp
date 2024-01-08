@@ -19,37 +19,20 @@ public:
      * Draw the player's state onto his screen
     */
     void render();
-    bool handleInputs(); // Returns whether the turn is completed
-
-    BattleField& getAllyBattlefield() { return battleField_; }
-    BattleField& getEnnemyBattlefield() { return opponent_->getAllyBattlefield(); }
-    const Army getArmy() { return army_; }
-    Player* getEnnemy() { return opponent_; }
-
     /**
-     * Process the removal of a unit at the given position
+     * Handle the inputs for this player and return whether the turn is completed
     */
-    void handleDisparition(int battlefieldPosition);
+    bool handleInputs();
 
     /**
-     * Updates the whole battlefield (create walls, handle aligned units, move units)
-    */
-    void updateBattleField();
-
-    /**
-     * Puts a unit at the given location.
+     * Put a unit at the given location.
      * Returns whether the operation was successfull
     */
     bool putUnit(Unit* unit, const Vector& position);
 
-    /**
-     * Handle the number action per turn
-    */
-   void startTurn();
-   bool actionDone() { --remainingMoves_; return remainingMoves_ <= 0; }
 
     /**
-     * Returns a reference for the Unit at the given position
+     * Return a reference for the Unit at the given position
     */
     Unit*& at(int x, int y);
 
@@ -60,7 +43,7 @@ public:
 
 private:
     /**
-     * Returns the OamState to be used for this player (either &oamMain or &oamSub)
+     * Return the OamState to be used for this player (either &oamMain or &oamSub)
     */
     OamState* oam() const;
     bool hasSelectedUnit() const;
@@ -73,12 +56,9 @@ private:
     Vector computeOnScreenCoordinates(const Vector& coord, bool selectedOffset);
 
     Character* character_;
-    Army army_;
     BattleField battleField_;
 
     int currentHealth_;
-    int invocableUnits_;
-    int remainingMoves_;
 
     Vector selectedUnit_;
     uint32_t keyAPressedAt_;
@@ -86,8 +66,7 @@ private:
 
     std::vector<u16*> spritesGfx_;
 
-    bool sub_; // false if it's the opponent
-    Player* opponent_;
+    bool sub_;
 
     PrintConsole console_;
 };

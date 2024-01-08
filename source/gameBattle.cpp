@@ -2,17 +2,18 @@
 #include "soundbank.h"
 #include <maxmod9.h>
 
-GameBattle::GameBattle(Faction firstPlayer, Faction secondPlayer) :
-    playerA_(firstPlayer, false),
-    playerB_(secondPlayer, true),
-    playerAPlaying_(true) { }
-GameBattle::~GameBattle() { }
+GameBattle::GameBattle(Faction firstPlayer, Faction secondPlayer) : playerA_(firstPlayer, false),
+                                                                    playerB_(secondPlayer, true),
+                                                                    playerAPlaying_(true) {}
+GameBattle::~GameBattle() {}
 
-Player& GameBattle::currentPlayer() {
+Player &GameBattle::currentPlayer()
+{
     return playerAPlaying_ ? playerA_ : playerB_;
 }
 
-void GameBattle::init() {
+void GameBattle::init()
+{
     // Reset the timer to match with game time
     resetTime();
 
@@ -33,7 +34,8 @@ void GameBattle::init() {
     playerA_.init();
     playerB_.init();
 }
-void GameBattle::deinit() {
+void GameBattle::deinit()
+{
     // Unload the battle's music and sound effects
     mmUnload(MOD_BATTLE);
     mmUnloadEffect(SFX_BATTLE_ENEMY_HIT);
@@ -45,19 +47,18 @@ void GameBattle::deinit() {
     mmUnloadEffect(SFX_BATTLE_WALL_KILLED);
 }
 
-void GameBattle::render() {
+void GameBattle::render()
+{
     playerA_.render();
     playerB_.render();
 }
 
-GameState* GameBattle::handle_inputs() {
+GameState *GameBattle::handle_inputs()
+{
     // Make the current player handle the inputs, and switch the turn to the other player if he as finished
-    if (currentPlayer().handleInputs()) {
-        if (currentPlayer().actionDone()) {
-            playerAPlaying_ = !playerAPlaying_;
-            (playerAPlaying_) ? playerA_.startTurn() : playerB_.startTurn();
-            
-        }
+    if (currentPlayer().handleInputs())
+    {
+        playerAPlaying_ = !playerAPlaying_;
     }
 
     return nullptr;

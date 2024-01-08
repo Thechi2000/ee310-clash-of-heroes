@@ -44,15 +44,3 @@ enum UnitType {
     Drake,
     SylvanWall,
 };
-
-/**
- * Army of a player. Each army contains 1 wall type, 3 core units and 2 special units
-*/
-struct Army {
-    UnitType soldierA;
-    UnitType soldierB;
-    UnitType soldierC;
-    UnitType specialA;
-    UnitType specialB;
-    UnitType wall;
-};

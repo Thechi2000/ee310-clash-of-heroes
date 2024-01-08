@@ -26,7 +26,6 @@ public:
 class Spearman : public CoreUnit {
 public:
     Spearman(Player* currentPlayer, ColorType colorType) : CoreUnit(3, 9, 2, currentPlayer, UnitType::Spearman, colorType, 6) { };
-    int attack(BattleField& opponentBattlefield, int attackedColumn);
 };
 
 /**
@@ -35,8 +34,6 @@ public:
 class Knight : public EliteUnit {
 public:
     Knight(Player* currentPlayer, ColorType colorType) : EliteUnit(4, 30, 6, currentPlayer, UnitType::Knight, colorType, 12) { };
-    void onTransformToAttack();
-    bool updateCharge();
 };
 
 /**
@@ -45,7 +42,6 @@ public:
 class Angel : public ChampionUnit {
 public:
     Angel(Player* currentPlayer, ColorType colorType) : ChampionUnit(6, 115, 23, currentPlayer, UnitType::Angel, colorType, 24) { };
-    bool updateCharge();
 };
 
 /**

@@ -11,9 +11,6 @@ typedef std::array<Unit*, 48> BattleField;
 
 class Unit {
 public:
-    virtual int disappear(); // return damage dealt
-    virtual void onTransformToWall() { }
-    virtual void onTransformToAttack();
     const Vector& getSize() const { return size_; }
     virtual bool getIsCharging() const { return isCharging_; }
     virtual int getToughness() const { return toughness_; }
@@ -22,21 +19,7 @@ public:
     const UnitType getType() const { return unitType_; }
     const ColorType getColor() const { return colorType_; }
 
-    virtual void heal();
-    virtual void onFusion(Unit* fusionUnit);
-    const bool isEqual(Unit* other) { return other == nullptr ? false : (colorType_ == other->getColor()) && (unitType_ == other->getType()) && (isCharging_ == other->getIsCharging()); }
-
     virtual ~Unit() { }
-
-    /**
-     *  Returns true if the unit attacks
-    */
-    virtual bool updateCharge();
-
-    /**
-     *  Returns the damage dealt to the enemy player
-    */
-    virtual int attack(BattleField& opponentBattlefield, int attackedColumn);
 
     int getSpriteIdAt(const Vector& position);
 
@@ -100,9 +83,6 @@ protected:
 };
 
 class ChampionUnit : public SpecialUnit {
-public:
-    virtual int attack(BattleField& opponentBattlefield, int attackedColumn);
-
 protected:
     ChampionUnit(int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) : SpecialUnit(2, charge, power, toughness, currentPlayer, unitType, colorType, spriteId) { };
 };
