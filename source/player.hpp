@@ -5,10 +5,12 @@
 #include "units.hpp"
 #include <vector>
 
-struct BattleField;
+// 8 columns of 6-tile units
+typedef std::array<Unit *, 48> BattleField;
 class Unit;
 
-class Player {
+class Player
+{
 public:
     Player(Faction faction);
     ~Player();
@@ -18,20 +20,24 @@ public:
     void render();
     void handleInputs();
 
-    BattleField* getAllyBattlefield() { return battleField_; }
-    BattleField* getEnnemyBattlefield() { return opponent_->getAllyBattlefield(); }
+    BattleField &getAllyBattlefield() { return battleField_; }
+    BattleField &getEnnemyBattlefield() { return opponent_->getAllyBattlefield(); }
+    const Army getArmy() { return army_; }
+    Player* getEnnemy() { return opponent_; }
 
-    Unit*& at(int x, int y);
+    void handleDisparition(int battlefieldPosition);
+
+    Unit *&at(int x, int y);
 
     void init();
 
 private:
-    OamState* oam() const;
+    OamState *oam() const;
     bool hasSelectedUnit() const;
 
-    Character* character_;
+    Character *character_;
     Army army_;
-    BattleField* battleField_;
+    BattleField battleField_;
 
     int currentHealth_;
     int invocableUnits_;
@@ -40,10 +46,10 @@ private:
     uint32_t keyAPressedAt_;
     uint32_t touchScreenPressedAt_;
 
-    std::vector<u16*> spritesGfx_;
+    std::vector<u16 *> spritesGfx_;
 
     bool me_; // false if it's the opponent
-    Player* opponent_;
+    Player *opponent_;
 
     PrintConsole console_;
 };

@@ -9,24 +9,15 @@ enum UnitType {
 
     Haven_Start,
     // Haven
-    Soldier,
+    Swordsman,
     Archer,
     Spearman,
 
     // Haven special
     Knight,
     Angel,
+    Haven_Wall,
     Haven_End,
-
-    SubUnits,
-    // Position (B : Back - F : Front - R : Right - L : Left)
-    CoreCharging_F,
-    CoreCharging_B,
-    CoreCharging_BB,
-    Elite_B,
-    Champion_LB,
-    Champion_RF,
-    Champion_RB,
 };
 
 struct Army

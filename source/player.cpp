@@ -1,4 +1,5 @@
 #include "player.hpp"
+#include "army.hpp"
 
 #define SPRITE_SIZE (32 * 32)
 
@@ -6,7 +7,7 @@ class TestUnit : public Unit {
 public:
     virtual ~TestUnit() { }
 
-    TestUnit(int x, int y, Player* player, int spriteId) : Unit(x, y, 3, 6, 4, player, spriteId) { }
+    TestUnit(int x, int y, Player* player, UnitType unitType, int spriteId) : Unit(x, y, 3, 6, 4, player, unitType, spriteId) { }
 
     void onTransformToAttack() { }
     void onTransformToWall() { }
@@ -14,7 +15,7 @@ public:
 };
 
 Player::Player(Faction faction) : character_(Character::fromFaction(faction)), selectedUnit_{ -1, -1 } {
-    battleField_->units.fill(nullptr);
+    battleField_.fill(nullptr);
 
     // TODO REMOVE
     static bool isMe = false;
@@ -22,7 +23,7 @@ Player::Player(Faction faction) : character_(Character::fromFaction(faction)), s
     isMe = true;
 
     for (int i = 0; i < 48; ++i) {
-        battleField_->units[i] = new TestUnit(1, 1, this, i % 9 + 1);
+        battleField_[i] = new TestUnit(1, 1, this, UnitType::Swordsman, i % 9 + 1);
     }
     // END REMOVE
 }
@@ -86,8 +87,8 @@ void Player::init() {
 Player::~Player() {
     delete character_;
 
-    for (size_t i = 0; i < battleField_->units.size(); ++i) {
-        auto unit = battleField_->units[i];
+    for (size_t i = 0; i < battleField_.size(); ++i) {
+        auto unit = battleField_[i];
 
         if (unit != nullptr) {
             for (size_t x = 0; x < unit->getSize().x; ++x) {
@@ -106,7 +107,7 @@ Player::~Player() {
 }
 
 Unit*& Player::at(int x, int y) {
-    return battleField_->units[x + 8 * y];
+    return battleField_[x + 8 * y];
 }
 
 OamState* Player::oam() const {
@@ -228,6 +229,54 @@ void Player::handleInputs() {
             }
         }
     }
+}
+
+void Player::handleDisparition(int battlefieldPosition)
+{
+    
+    Unit *u = battleField_[battlefieldPosition];
+    UnitType uT = u->getType();
+
+    if (uT == None)
+    {
+        return;
+    }
+    if (uT == army_.specialA || uT == army_.specialB)
+    {
+        size_t x = battleField_[battlefieldPosition]->getSize().x;
+        size_t y = battleField_[battlefieldPosition]->getSize().y;
+
+        int minX = (battlefieldPosition/8 - x < 0) ? 0 : battlefieldPosition / 8 - x;
+        int minY = (battlefieldPosition%6 - y < 0) ? 0 : battlefieldPosition%6 - y;
+        int maxX = (battlefieldPosition/8 + x >= 8) ? 7 : battlefieldPosition / 8 + x;
+        int maxY = (battlefieldPosition%6 + y >= 6) ? 5 : battlefieldPosition%6 + y;
+
+        for (int i = minY; i < maxY; i++)
+        {
+            for (int j = minX; j < maxX; j++)
+            {
+                if (battleField_[battlefieldPosition + i + 8 * j] == u)
+                {
+                    battleField_[battlefieldPosition + i + 8 * j] = nullptr;
+                }
+            }
+        }
+    }
+    else
+    {
+        if (u->getIsCharging())
+        {
+            for (int i = std::max(battlefieldPosition%6 - 3, 0); i < std::max(battlefieldPosition%6 + 3, 6); ++i)
+            {
+                if (battleField_[battlefieldPosition + i] == u) {
+                    battleField_[battlefieldPosition + i] = nullptr;
+                }
+            }
+        }
+        battleField_[battlefieldPosition] = nullptr;
+    }
+
+    delete u;
 }
 
 void Player::update() { }

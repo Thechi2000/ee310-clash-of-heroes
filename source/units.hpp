@@ -5,15 +5,7 @@
 
 class Unit;
 class Player;
-
-// 8 columns of 6-tile units
-typedef struct BattleField {
-    std::array<UnitType, 48> unitTypes;
-    std::array<Unit *, 48> units;
-};
-
-// Return next index to consider
-void handleDisparition(int battlefieldPosition, BattleField &battleField);
+typedef std::array<Unit *, 48> BattleField;
 
 // ---------------------------------------------------------------------- //
 
@@ -28,6 +20,7 @@ public:
     virtual int getToughness() const { return toughness_; }
     virtual int getPower() const { return power_; }
     virtual int getCharge() const { return charge_; }
+    const UnitType getType() const { return unitType_; }
 
     virtual void heal();
 
@@ -52,8 +45,8 @@ public:
     }
 
 protected:
-    Unit(int width, int length, int charge, int power, int toughness, Player* currentPlayer, int spriteId) : Unit({.x = width, .y = length}, charge, power, toughness, currentPlayer, spriteId) {}
-    Unit(Vector size, int charge, int power, int toughness, Player* currentPlayer, int spriteId) : size_(size), charge_(charge), power_(power), toughness_(toughness), health_(toughness), currentPlayer_(currentPlayer), spriteId_(spriteId) {}
+    Unit(int width, int length, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : Unit({.x = width, .y = length}, charge, power, toughness, currentPlayer, unitType, spriteId) {}
+    Unit(Vector size, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : size_(size), charge_(charge), power_(power), toughness_(toughness), health_(toughness), currentPlayer_(currentPlayer), unitType_(unitType), spriteId_(spriteId) {}
 
     Vector size_;
 
@@ -70,12 +63,13 @@ protected:
     int spriteId_;
 
     Player* currentPlayer_;
+    UnitType unitType_;
 };
 
 class SpecialUnit : public Unit
 {
 protected:
-    SpecialUnit(int width, int charge, int power, int toughness, Player* currentPlayer, int spriteId) : Unit(width, 2, charge, power, toughness, currentPlayer, spriteId){};
+    SpecialUnit(int width, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : Unit(width, 2, charge, power, toughness, currentPlayer, unitType, spriteId){};
 };
 
 // ---------------------------------------------------------------------- //
@@ -83,13 +77,13 @@ protected:
 class CoreUnit : public Unit
 {
 protected:
-    CoreUnit(int charge, int power, int toughness, Player* currentPlayer, int spriteId) : Unit(1, 1, charge, power, toughness, currentPlayer, spriteId){};
+    CoreUnit(int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : Unit(1, 1, charge, power, toughness, currentPlayer, unitType, spriteId){};
 };
 
 class EliteUnit : public SpecialUnit
 {
 protected:
-    EliteUnit(int charge, int power, int toughness, Player* currentPlayer, int spriteId) : SpecialUnit(1, charge, power, toughness, currentPlayer, spriteId){};
+    EliteUnit(int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : SpecialUnit(1, charge, power, toughness, currentPlayer, unitType, spriteId){};
 };
 
 class ChampionUnit : public SpecialUnit
@@ -98,7 +92,7 @@ public:
     virtual int attack(BattleField &opponentBattlefield, int attackedColumn);
 
 protected:
-    ChampionUnit(int charge, int power, int toughness, Player* currentPlayer, int spriteId) : SpecialUnit(2, charge, power, toughness, currentPlayer, spriteId){};
+    ChampionUnit(int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : SpecialUnit(2, charge, power, toughness, currentPlayer, unitType, spriteId){};
 };
 
 // ---------------------------------------------------------------------- //
@@ -112,5 +106,5 @@ public:
 
 protected:
     /* Power : Max health / Toughness : Initial health */
-    Wall(int health, Player* currentPlayer, int spriteId) : Unit(1, 1, 0, health * 2, health, currentPlayer, spriteId) {}
+    Wall(int health, Player* currentPlayer, UnitType unitType, int spriteId) : Unit(1, 1, 0, health * 2, health, currentPlayer, unitType, spriteId) {}
 };
