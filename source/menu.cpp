@@ -19,41 +19,41 @@ struct CharacterDisplay {
 };
 
 const CharacterDisplay characters[] = { CharacterDisplay {
-        .name = "test1",
-        .spell_name = "SPELL1",
-        .spell_description = "spell test test test",
-        .wall_name = "WALL",
-        .wall_description = "wall test test test",
+        .name = "Anwen",
+        .spell_name = "ANWNEN'S ARROW",
+        .spell_description = "Anwen's arrow",
+        .wall_name = "SYLVAN WALL",
+        .wall_description = "Build a mystical wood wall",
         .x = 0,
         .y = 0,
         .faction = Faction::Sylvan,
     },
     CharacterDisplay {
-        .name = "test2",
-        .spell_name = "SPELL2",
-        .spell_description = "spell test test test",
-        .wall_name = "WALL",
-        .wall_description = "wall test test test",
+        .name = "Findan",
+        .spell_name = "FINDAN'S DISCRETION",
+        .spell_description = "Findan's discretion",
+        .wall_name = "SYLVAN WALL",
+        .wall_description = "Build a mystical wood wall",
         .x = 0,
         .y = 0,
         .faction = Faction::Sylvan,
     },
     CharacterDisplay {
-        .name = "test3",
-        .spell_name = "SPELL3",
-        .spell_description = "spell test test test",
-        .wall_name = "WALL",
-        .wall_description = "wall test test test",
+        .name = "Godric",
+        .spell_name = "GODRIC'S GRACE",
+        .spell_description = "Gordric's grace",
+        .wall_name = "HAVEN WALL",
+        .wall_description = "Build a wall of light",
         .x = 0,
         .y = 0,
         .faction = Faction::Haven,
     },
     CharacterDisplay {
-        .name = "test4",
-        .spell_name = "SPELL4",
-        .spell_description = "spell test test test",
-        .wall_name = "WALL",
-        .wall_description = "wall test test test",
+        .name = "Varkas",
+        .spell_name = "VARKAS' ARMOR",
+        .spell_description = "Varkas' armor",
+        .wall_name = "HAVEN WALL",
+        .wall_description = "Build a wall of light",
         .x = 0,
         .y = 0,
         .faction = Faction::Haven,
@@ -135,6 +135,7 @@ void CharacterSelectionMenu::render() {
         drawCharacter(selectedCharacter_, 8, 2);
 
         consoleSelect(&mainPrinter_);
+        consoleClear();
 
         printf(
             "\x1B[32m\033[3;4H%s\033[5;3H%s\033[14;4H%s\033[16;3H%s",
@@ -145,6 +146,7 @@ void CharacterSelectionMenu::render() {
         );
 
         consoleSelect(&subPrinter_);
+        consoleClear();
         printf("\x1B[32m\033[19;12H%s", character->name);
         printf("\x1B[32m\033[0;12HPlayer %s", firstPlayerFaction_.has_value() ? "2" : "1");
 
