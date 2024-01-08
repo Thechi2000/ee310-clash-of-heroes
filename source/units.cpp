@@ -11,6 +11,12 @@ int Unit::disappear()
 void Unit::onTransformToAttack()
 {
     is_charging_ = true;
+    fusion_ = 1;
+}
+
+void Unit::onFusion(Unit* fusionUnit) {
+    ++fusion_;
+    health_ += fusionUnit->disappear();
 }
 
 bool Unit::updateCharge()
@@ -20,7 +26,7 @@ bool Unit::updateCharge()
         return false;
     }
 
-    health_ = (power_ - toughness_) / charge_;
+    health_ += fusion_ * (power_ - toughness_) / charge_;
     remainingChargeTurns_ -= 1;
 
     if (!remainingChargeTurns_)
@@ -89,8 +95,8 @@ void Unit::heal()
 {
     if (is_charging_)
     {
-        float maxCurrentHealth = (power_ - toughness_) * (1 - remainingChargeTurns_ / charge_);
-        float heal = (power_ - toughness_) / charge_;
+        float maxCurrentHealth = fusion_ * (power_ - toughness_) * (1 - remainingChargeTurns_ / charge_);
+        float heal = fusion_ * (power_ - toughness_) / charge_;
 
         health_ = std::min(maxCurrentHealth, health_ + heal);
     }

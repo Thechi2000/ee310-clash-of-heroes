@@ -26,6 +26,7 @@ public:
     Player* getEnnemy() { return opponent_; }
 
     void handleDisparition(int battlefieldPosition);
+    void updateBattleField();
 
     Unit *&at(int x, int y);
 
@@ -34,6 +35,7 @@ public:
 private:
     OamState *oam() const;
     bool hasSelectedUnit() const;
+    void startCoreUnitCharge(int battlefieldPosition);
 
     Character *character_;
     Army army_;

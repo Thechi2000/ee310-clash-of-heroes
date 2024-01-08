@@ -1,4 +1,12 @@
 #pragma once
+
+enum ColorType {
+    ColorA,
+    ColorB,
+    ColorC,
+    WallColor,
+};
+
 enum Faction : unsigned int {
     Haven,
     Sylvan,

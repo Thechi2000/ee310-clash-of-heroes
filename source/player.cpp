@@ -1,43 +1,48 @@
 #include "player.hpp"
 #include "army.hpp"
+#include "haven.hpp"
 
 #define SPRITE_SIZE (32 * 32)
 
-class TestUnit : public Unit {
+class TestUnit : public Unit
+{
 public:
-    virtual ~TestUnit() { }
+    virtual ~TestUnit() {}
 
-    TestUnit(int x, int y, Player* player, UnitType unitType, int spriteId) : Unit(x, y, 3, 6, 4, player, unitType, spriteId) { }
+    TestUnit(int x, int y, Player *player, UnitType unitType, ColorType colorType, int spriteId) : Unit(x, y, 3, 6, 4, player, unitType, colorType, spriteId) {}
 
-    void onTransformToAttack() { }
-    void onTransformToWall() { }
-    bool updateCharge() { }
+    void onTransformToAttack() {}
+    void onTransformToWall() {}
+    bool updateCharge() {}
 };
 
-Player::Player(Faction faction, bool sub) :
-    character_(Character::fromFaction(faction)),
-    selectedUnit_{ -1, -1 },
-    sub_(sub) {
+Player::Player(Faction faction, bool sub) : character_(Character::fromFaction(faction)),
+                                            selectedUnit_{-1, -1},
+                                            sub_(sub)
+{
     battleField_.fill(nullptr);
 
-    for (int i = 0; i < 48; ++i) {
-        battleField_[i] = new TestUnit(1, 1, this, UnitType::Swordsman, i % 9 + 1);
+    for (int i = 0; i < 48; ++i)
+    {
+        battleField_[i] = new TestUnit(1, 1, this, UnitType::Swordsman, static_cast<ColorType>(i % 3), i % 9 + 1);
     }
     // END REMOVE
 }
 
-void Player::init() {
+void Player::init()
+{
     consoleInit(&console_, 0, BgType_Text4bpp, BgSize_T_256x256, 8, 0, !sub_, true);
 
-    if (sub_) {
+    if (sub_)
+    {
         VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
         REG_DISPCNT_SUB = 0; // Disable the display to avoid clutter on the screen while loading the different assets
         BGCTRL_SUB[2] = BG_BMP_BASE(4) | BgSize_B8_256x256;
 
-        mdCopy(BG_BMP_RAM_SUB(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8* array) {
+        mdCopy(BG_BMP_RAM_SUB(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8 *array)
+               {
             while (array[i] == 255) { i--; }
-            return array[i];
-            });
+            return array[i]; });
         dmaCopy(character_->bgPal, BG_PALETTE_SUB, character_->bgPalLen);
         BG_PALETTE_SUB[255] = ARGB16(1, 28, 60, 28);
 
@@ -50,15 +55,17 @@ void Player::init() {
 
         VRAM_D_CR = VRAM_ENABLE | VRAM_D_SUB_SPRITE;
         swiCopy(character_->spritePal, SPRITE_PALETTE_SUB, character_->spritePalLen / 2);
-    } else {
+    }
+    else
+    {
         VRAM_A_CR = VRAM_ENABLE | VRAM_A_MAIN_BG;
         REG_DISPCNT = 0; // Disable the display to avoid clutter on the screen while loading the different assets
         BGCTRL[2] = BG_BMP_BASE(4) | BgSize_B8_256x256;
 
-        mdCopy(BG_BMP_RAM(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8* array) {
+        mdCopy(BG_BMP_RAM(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8 *array)
+               {
             while (array[i] == 255) { i--; }
-            return array[i];
-            });
+            return array[i]; });
         dmaCopy(character_->bgPal, BG_PALETTE, character_->bgPalLen);
         BG_PALETTE[255] = ARGB16(1, 28, 60, 28);
 
@@ -75,22 +82,28 @@ void Player::init() {
 
     oamInit(oam(), SpriteMapping_1D_128, false);
 
-    for (int i = 0; i < character_->spriteTilesLen / SPRITE_SIZE; ++i) {
+    for (int i = 0; i < character_->spriteTilesLen / SPRITE_SIZE; ++i)
+    {
         auto gfx = oamAllocateGfx(oam(), SpriteSize_32x32, SpriteColorFormat_256Color);
         spritesGfx_.push_back(gfx);
         swiCopy(character_->spriteTiles + i * SPRITE_SIZE, gfx, SPRITE_SIZE / 2);
     }
 }
 
-Player::~Player() {
+Player::~Player()
+{
     delete character_;
 
-    for (size_t i = 0; i < battleField_.size(); ++i) {
+    for (size_t i = 0; i < battleField_.size(); ++i)
+    {
         auto unit = battleField_[i];
 
-        if (unit != nullptr) {
-            for (size_t x = 0; x < unit->getSize().x; ++x) {
-                for (size_t y = 0; y < unit->getSize().y; ++y) {
+        if (unit != nullptr)
+        {
+            for (size_t x = 0; x < unit->getSize().x; ++x)
+            {
+                for (size_t y = 0; y < unit->getSize().y; ++y)
+                {
                     at(x, y) = nullptr;
                 }
             }
@@ -99,33 +112,42 @@ Player::~Player() {
         }
     }
 
-    for (auto gfx : spritesGfx_) {
+    for (auto gfx : spritesGfx_)
+    {
         oamFreeGfx(oam(), gfx);
     }
 }
 
-Unit*& Player::at(int x, int y) {
+Unit *&Player::at(int x, int y)
+{
     return battleField_[x + 8 * y];
 }
 
-OamState* Player::oam() const {
+OamState *Player::oam() const
+{
     return sub_ ? &oamSub : &oamMain;
 }
 
 bool Player::hasSelectedUnit() const { return selectedUnit_.x != -1 && selectedUnit_.y != -1; }
 
-void Player::render() {
-    for (size_t x = 0; x < 8; ++x) {
-        for (size_t y = 0; y < 6; ++y) {
+void Player::render()
+{
+    for (size_t x = 0; x < 8; ++x)
+    {
+        for (size_t y = 0; y < 6; ++y)
+        {
             auto unit = at(x, y);
-            if (unit != nullptr) {
-                Vector relativePosition{ .x = 0, .y = 0 };
-                while (at(x - relativePosition.x, y) == unit) {
+            if (unit != nullptr)
+            {
+                Vector relativePosition{.x = 0, .y = 0};
+                while (at(x - relativePosition.x, y) == unit)
+                {
                     ++relativePosition.x;
                 }
                 relativePosition.x--;
 
-                while (at(x - relativePosition.x, y - relativePosition.y) == unit) {
+                while (at(x - relativePosition.x, y - relativePosition.y) == unit)
+                {
                     ++relativePosition.y;
                 }
                 relativePosition.y--;
@@ -146,15 +168,17 @@ void Player::render() {
                     false,
                     false,
                     false, false,
-                    false
-                );
-            } else {
+                    false);
+            }
+            else
+            {
                 oamSetHidden(oam(), x + y * 8, true);
             }
         }
     }
 
-    if (hasSelectedUnit() && at(selectedUnit_.x, selectedUnit_.y) == nullptr) {
+    if (hasSelectedUnit() && at(selectedUnit_.x, selectedUnit_.y) == nullptr)
+    {
         oamSet(
             oam(),
             49,
@@ -168,9 +192,10 @@ void Player::render() {
             false,
             false,
             false, false,
-            false
-        );
-    } else {
+            false);
+    }
+    else
+    {
         oamSetHidden(oam(), 49, true);
     }
 
@@ -190,44 +215,68 @@ void Player::render() {
     printf("HP: %0.3ld/%0.3ld", currentHealth_, character_->maxHealth());
 
     // Enable the display after the first render
-    if (sub_) {
+    if (sub_)
+    {
         REG_DISPCNT_SUB |= MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG2_ACTIVE;
-    } else {
+    }
+    else
+    {
         REG_DISPCNT |= MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG2_ACTIVE;
     }
 }
 
-bool Player::handleInputs() {
+bool Player::handleInputs()
+{
     auto keys = keysDown();
-    if (!hasSelectedUnit() && (keys & (KEY_UP | KEY_DOWN | KEY_RIGHT | KEY_LEFT))) {
+    if (!hasSelectedUnit() && (keys & (KEY_UP | KEY_DOWN | KEY_RIGHT | KEY_LEFT)))
+    {
         selectedUnit_.x = 0;
         selectedUnit_.y = 0;
-    } else {
-        if (keys & KEY_UP) { selectedUnit_.y = selectedUnit_.y - 1; }
-        if (keys & KEY_DOWN) { selectedUnit_.y = selectedUnit_.y + 1; }
-        if (keys & KEY_LEFT) { selectedUnit_.x = selectedUnit_.x - 1; }
-        if (keys & KEY_RIGHT) { selectedUnit_.x = selectedUnit_.x + 1; }
+    }
+    else
+    {
+        if (keys & KEY_UP)
+        {
+            selectedUnit_.y = selectedUnit_.y - 1;
+        }
+        if (keys & KEY_DOWN)
+        {
+            selectedUnit_.y = selectedUnit_.y + 1;
+        }
+        if (keys & KEY_LEFT)
+        {
+            selectedUnit_.x = selectedUnit_.x - 1;
+        }
+        if (keys & KEY_RIGHT)
+        {
+            selectedUnit_.x = selectedUnit_.x + 1;
+        }
     }
 
-    if (keys & KEY_B) {
+    if (keys & KEY_B)
+    {
         selectedUnit_.x = -1;
         selectedUnit_.y = -1;
     }
 
-    if ((keys & KEY_A) || (sub_ && (keys & KEY_TOUCH))) {
-        if ((keys & KEY_A)) {
+    if ((keys & KEY_A) || (sub_ && (keys & KEY_TOUCH)))
+    {
+        if ((keys & KEY_A))
+        {
             keyAPressedAt_ = timeAsMilliseconds();
         }
 
-
-        if (sub_ && (keys & KEY_TOUCH)) {
+        if (sub_ && (keys & KEY_TOUCH))
+        {
             touchPosition pos = touchReadXY();
 
-            if (IN_RANGE(pos.px, 16, 240) && IN_RANGE(pos.py, 0, 168)) {
+            if (IN_RANGE(pos.px, 16, 240) && IN_RANGE(pos.py, 0, 168))
+            {
                 int x = (pos.px - 16) / 32;
                 int y = pos.py / 32;
 
-                if (selectedUnit_.x != x || selectedUnit_.y != y) {
+                if (selectedUnit_.x != x || selectedUnit_.y != y)
+                {
                     touchScreenPressedAt_ = timeAsMilliseconds();
                 }
 
@@ -235,19 +284,24 @@ bool Player::handleInputs() {
                 selectedUnit_.y = y;
             }
         }
-    } else {
+    }
+    else
+    {
         uint64_t heldTime = 0;
-        if (keyAPressedAt_ && !(keysHeld() & KEY_A)) {
+        if (keyAPressedAt_ && !(keysHeld() & KEY_A))
+        {
             heldTime = timeAsMilliseconds() - keyAPressedAt_;
             keyAPressedAt_ = 0;
         }
-        if (touchScreenPressedAt_ && !(keysHeld() & KEY_TOUCH)) {
+        if (touchScreenPressedAt_ && !(keysHeld() & KEY_TOUCH))
+        {
             heldTime = timeAsMilliseconds() - touchScreenPressedAt_;
             touchScreenPressedAt_ = 0;
         }
 
-        if (heldTime > 0) {
-            selectedUnit_ = { -1, -1 };
+        if (heldTime > 0)
+        {
+            selectedUnit_ = {-1, -1};
             return true;
         }
     }
@@ -268,10 +322,10 @@ void Player::handleDisparition(int battlefieldPosition)
         size_t x = battleField_[battlefieldPosition]->getSize().x;
         size_t y = battleField_[battlefieldPosition]->getSize().y;
 
-        int minX = (battlefieldPosition/8 - x < 0) ? 0 : battlefieldPosition / 8 - x;
-        int minY = (battlefieldPosition%6 - y < 0) ? 0 : battlefieldPosition%6 - y;
-        int maxX = (battlefieldPosition/8 + x >= 8) ? 7 : battlefieldPosition / 8 + x;
-        int maxY = (battlefieldPosition%6 + y >= 6) ? 5 : battlefieldPosition%6 + y;
+        int minX = (battlefieldPosition / 8 - x < 0) ? 0 : battlefieldPosition / 8 - x;
+        int minY = (battlefieldPosition % 6 - y < 0) ? 0 : battlefieldPosition % 6 - y;
+        int maxX = (battlefieldPosition / 8 + x >= 8) ? 7 : battlefieldPosition / 8 + x;
+        int maxY = (battlefieldPosition % 6 + y >= 6) ? 5 : battlefieldPosition % 6 + y;
 
         for (int i = minY; i < maxY; i++)
         {
@@ -288,9 +342,10 @@ void Player::handleDisparition(int battlefieldPosition)
     {
         if (u->getIsCharging())
         {
-            for (int i = std::max(battlefieldPosition%6 - 3, 0); i < std::max(battlefieldPosition%6 + 3, 6); ++i)
+            for (int i = std::max(battlefieldPosition % 6 - 3, 0); i < std::max(battlefieldPosition % 6 + 3, 6); ++i)
             {
-                if (battleField_[battlefieldPosition + i] == u) {
+                if (battleField_[battlefieldPosition + i] == u)
+                {
                     battleField_[battlefieldPosition + i] = nullptr;
                 }
             }
@@ -301,4 +356,75 @@ void Player::handleDisparition(int battlefieldPosition)
     delete u;
 }
 
-void Player::update() { }
+void Player::updateBattleField()
+{
+    bool isChanged = true;
+    while (isChanged)
+    {
+        bool isChanged = false;
+        BattleField newBattleField;
+        newBattleField.fill(nullptr);
+
+        for (int x = 0; x < 8; ++x)
+        {
+            for (int y = 0; y < 6; ++y)
+            {
+                Unit *u = battleField_[8 * x + y];
+                if (u != nullptr)
+                {
+                    UnitType uT = u->getType();
+                    // Core Units
+                    if (uT == army_.soldierA || uT == army_.soldierB || uT == army_.soldierC)
+                    {
+                        if (u->getIsCharging())
+                        {
+                            // Core unit is charging + fusion
+                            newBattleField[8 * x + y + 0] = u;
+                            newBattleField[8 * x + y + 1] = u;
+                            newBattleField[8 * x + y + 2] = u;
+                            y += 2;
+
+                            // Core Unit fusion
+                            Unit *uF = battleField_[8 * x + y - 3];
+                            if (y > 2 && u->isEqual(uF))
+                            {
+                                u->onFusion(uF);
+                                y += 3;
+                                delete uF;
+                                isChanged = true;
+                            }
+                        } else {
+                            // Core Unit to wall
+                            if (newBattleField[8 * x + y] == nullptr && x < 6 && u->isEqual(battleField_[8 * x + y + 8]) && u->isEqual(battleField_[8 * x + y + 16])) {
+                                int i = x;
+                                while (i < 8 && u->isEqual(newBattleField[8 * i + y])) {
+                                    newBattleField[8 * i + y] = new HavenWall(this);
+                                }
+                            }
+
+                            // Core Unit 
+                        }
+
+                        
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Player::startCoreUnitCharge(int battlefieldPosition) {
+    int y = battlefieldPosition%6;
+    Unit* u = battleField_[battlefieldPosition];
+    if (battlefieldPosition > 3 || u == nullptr || !u->isEqual(battleField_[battlefieldPosition + 1]) || !u->isEqual(battleField_[battlefieldPosition + 2])) {
+        return;
+    }
+
+    u->onTransformToAttack();
+    delete battleField_[battlefieldPosition + 1];
+    delete battleField_[battlefieldPosition + 2];
+    battleField_[battlefieldPosition + 1] = u;
+    battleField_[battlefieldPosition + 2] = u;
+}
+
+void Player::update() {}

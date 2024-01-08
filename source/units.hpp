@@ -21,8 +21,11 @@ public:
     virtual int getPower() const { return power_; }
     virtual int getCharge() const { return charge_; }
     const UnitType getType() const { return unitType_; }
+    const ColorType getColor() const { return colorType_; }
 
     virtual void heal();
+    virtual void onFusion(Unit* fusionUnit);
+    const bool isEqual(Unit* other) { return other == nullptr ? false : (colorType_ == other->getColor()) && (unitType_ == other->getType()) && (is_charging_ == other->getIsCharging()); }
 
     virtual ~Unit() {}
 
@@ -45,8 +48,8 @@ public:
     }
 
 protected:
-    Unit(int width, int length, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : Unit({.x = width, .y = length}, charge, power, toughness, currentPlayer, unitType, spriteId) {}
-    Unit(Vector size, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : size_(size), charge_(charge), power_(power), toughness_(toughness), health_(toughness), currentPlayer_(currentPlayer), unitType_(unitType), spriteId_(spriteId) {}
+    Unit(int width, int length, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) : Unit({.x = width, .y = length}, charge, power, toughness, currentPlayer, unitType, colorType, spriteId) {}
+    Unit(Vector size, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) : size_(size), charge_(charge), power_(power), toughness_(toughness), health_(toughness), currentPlayer_(currentPlayer), unitType_(unitType), colorType_(colorType), spriteId_(spriteId) {}
 
     Vector size_;
 
@@ -57,6 +60,8 @@ protected:
     int charge_;       // #Turns before attacking
     Sprite neutralSprites_;
 
+    int fusion_;
+
     float health_;                 // Health and initial attack value
     int remainingChargeTurns_ = 0; // Remaining #turns before attacking
 
@@ -64,12 +69,13 @@ protected:
 
     Player* currentPlayer_;
     UnitType unitType_;
+    ColorType colorType_;
 };
 
 class SpecialUnit : public Unit
 {
 protected:
-    SpecialUnit(int width, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : Unit(width, 2, charge, power, toughness, currentPlayer, unitType, spriteId){};
+    SpecialUnit(int width, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) : Unit(width, 2, charge, power, toughness, currentPlayer, unitType, colorType, spriteId){};
 };
 
 // ---------------------------------------------------------------------- //
@@ -77,13 +83,13 @@ protected:
 class CoreUnit : public Unit
 {
 protected:
-    CoreUnit(int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : Unit(1, 1, charge, power, toughness, currentPlayer, unitType, spriteId){};
+    CoreUnit(int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) : Unit(1, 1, charge, power, toughness, currentPlayer, unitType, colorType, spriteId){};
 };
 
 class EliteUnit : public SpecialUnit
 {
 protected:
-    EliteUnit(int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : SpecialUnit(1, charge, power, toughness, currentPlayer, unitType, spriteId){};
+    EliteUnit(int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) : SpecialUnit(1, charge, power, toughness, currentPlayer, unitType, colorType, spriteId){};
 };
 
 class ChampionUnit : public SpecialUnit
@@ -92,7 +98,7 @@ public:
     virtual int attack(BattleField &opponentBattlefield, int attackedColumn);
 
 protected:
-    ChampionUnit(int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, int spriteId) : SpecialUnit(2, charge, power, toughness, currentPlayer, unitType, spriteId){};
+    ChampionUnit(int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) : SpecialUnit(2, charge, power, toughness, currentPlayer, unitType, colorType, spriteId){};
 };
 
 // ---------------------------------------------------------------------- //
@@ -106,5 +112,5 @@ public:
 
 protected:
     /* Power : Max health / Toughness : Initial health */
-    Wall(int health, Player* currentPlayer, UnitType unitType, int spriteId) : Unit(1, 1, 0, health * 2, health, currentPlayer, unitType, spriteId) {}
+    Wall(int health, Player* currentPlayer, UnitType unitType, int spriteId) : Unit(1, 1, 0, health * 2, health, currentPlayer, unitType, WallColor, spriteId) {}
 };
