@@ -9,6 +9,7 @@ public:
 
     void render();
     GameState* handle_inputs();
+    Player& currentPlayer();
 
     virtual void init();
     virtual void deinit();
@@ -16,4 +17,5 @@ public:
 private:
     Player playerA_;
     Player playerB_;
+    bool playerAPlaying_;
 };

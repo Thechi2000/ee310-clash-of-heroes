@@ -12,13 +12,13 @@ class Unit;
 class Player
 {
 public:
-    Player(Faction faction);
+    Player(Faction faction, bool sub);
     ~Player();
 
     virtual void update();
 
     void render();
-    void handleInputs();
+    bool handleInputs(); // Returns whether the turn is completed
 
     BattleField &getAllyBattlefield() { return battleField_; }
     BattleField &getEnnemyBattlefield() { return opponent_->getAllyBattlefield(); }
@@ -48,8 +48,8 @@ private:
 
     std::vector<u16 *> spritesGfx_;
 
-    bool me_; // false if it's the opponent
-    Player *opponent_;
+    bool sub_; // false if it's the opponent
+    Player* opponent_;
 
     PrintConsole console_;
 };

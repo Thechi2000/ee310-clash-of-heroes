@@ -20,6 +20,8 @@ class Character {
 public:
     static Character* fromFaction(Faction faction);
 
+    int maxHealth() const { return maxHealth_; }
+
     const void* spriteTiles;
     const size_t spriteTilesLen;
     const void* spritePal;
