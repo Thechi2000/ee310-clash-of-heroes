@@ -41,7 +41,7 @@ void Player::init() {
     if (sub_) {
         VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
         REG_DISPCNT_SUB = 0; // Disable the display to avoid clutter on the screen while loading the different assets
-        BGCTRL_SUB[2] = BG_BMP_BASE(4) | BgSize_B8_256x256;
+        BGCTRL_SUB[2] = BG_BMP_BASE(4) | BgSize_B8_256x256 | BG_PRIORITY_3;
 
         mdCopy(BG_BMP_RAM_SUB(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8* array) {
             while (array[i] == 255) { i--; }
@@ -61,7 +61,7 @@ void Player::init() {
     } else {
         VRAM_A_CR = VRAM_ENABLE | VRAM_A_MAIN_BG;
         REG_DISPCNT = 0; // Disable the display to avoid clutter on the screen while loading the different assets
-        BGCTRL[2] = BG_BMP_BASE(4) | BgSize_B8_256x256;
+        BGCTRL[2] = BG_BMP_BASE(4) | BgSize_B8_256x256 | BG_PRIORITY_3;
 
         mdCopy(BG_BMP_RAM(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8* array) {
             while (array[i] == 255) { i--; }
@@ -144,7 +144,7 @@ void Player::render() {
                     oam(),
                     x + y * 8,
                     x * 28 + 16, y * 28 + (sub_ ? 0 : 20) + (isSelected ? 5 : 0),
-                    0,
+                    isSelected ? 0 : 1,
                     0,
                     SpriteSize_32x32,
                     SpriteColorFormat_256Color,
@@ -153,7 +153,26 @@ void Player::render() {
                     false,
                     false,
                     false, false,
-                    false);
+                    false
+                );
+
+                if (unit->getIsCharging()) {
+                    oamSet(
+                        oam(),
+                        x + y * 8 + 48,
+                        x * 28 + 16, y * 28 + (sub_ ? 0 : 20) + (isSelected ? 5 : 0),
+                        2,
+                        0,
+                        SpriteSize_32x32,
+                        SpriteColorFormat_256Color,
+                        spritesGfx_[2],
+                        -1,
+                        false,
+                        false,
+                        false, false,
+                        false
+                    );
+                }
             } else {
                 oamSetHidden(oam(), x + y * 8, true);
             }
@@ -163,7 +182,7 @@ void Player::render() {
     if (hasSelectedUnit() && at(selectedUnit_.x, selectedUnit_.y) == nullptr) {
         oamSet(
             oam(),
-            49,
+            127,
             selectedUnit_.x * 28 + 16, selectedUnit_.y * 28 + (sub_ ? 0 : 20),
             0,
             0,
@@ -176,7 +195,7 @@ void Player::render() {
             false, false,
             false);
     } else {
-        oamSetHidden(oam(), 49, true);
+        oamSetHidden(oam(), 127, true);
     }
 
     oamUpdate(oam());

@@ -15,7 +15,7 @@ public:
     virtual void onTransformToWall() { }
     virtual void onTransformToAttack();
     const Vector& getSize() const { return size_; }
-    virtual bool getIsCharging() const { return is_charging_; }
+    virtual bool getIsCharging() const { return isCharging_; }
     virtual int getToughness() const { return toughness_; }
     virtual int getPower() const { return power_; }
     virtual int getCharge() const { return charge_; }
@@ -24,7 +24,7 @@ public:
 
     virtual void heal();
     virtual void onFusion(Unit* fusionUnit);
-    const bool isEqual(Unit* other) { return other == nullptr ? false : (colorType_ == other->getColor()) && (unitType_ == other->getType()) && (is_charging_ == other->getIsCharging()); }
+    const bool isEqual(Unit* other) { return other == nullptr ? false : (colorType_ == other->getColor()) && (unitType_ == other->getType()) && (isCharging_ == other->getIsCharging()); }
 
     virtual ~Unit() { }
 
@@ -43,12 +43,29 @@ public:
     }
 
 protected:
-    Unit(int width, int length, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) : Unit({ .x = width, .y = length }, charge, power, toughness, currentPlayer, unitType, colorType, spriteId) { }
-    Unit(Vector size, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) : size_(size), charge_(charge), power_(power), toughness_(toughness), health_(toughness), currentPlayer_(currentPlayer), unitType_(unitType), colorType_(colorType), spriteId_(spriteId) { }
+    Unit(int width, int length, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) :
+        Unit({ .x = width, .y = length },
+            charge,
+            power,
+            toughness,
+            currentPlayer,
+            unitType,
+            colorType,
+            spriteId) { }
+    Unit(Vector size, int charge, int power, int toughness, Player* currentPlayer, UnitType unitType, ColorType colorType, int spriteId) :
+        size_(size),
+        charge_(charge),
+        power_(power),
+        toughness_(toughness),
+        health_(toughness),
+        currentPlayer_(currentPlayer),
+        unitType_(unitType),
+        colorType_(colorType),
+        spriteId_(spriteId) { }
 
     Vector size_;
 
-    bool is_charging_ = false;
+    bool isCharging_ = false;
 
     int toughness_;    // Base health and attack
     int power_;        // Max attack

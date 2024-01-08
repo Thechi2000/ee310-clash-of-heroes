@@ -10,7 +10,7 @@ int Unit::disappear()
 
 void Unit::onTransformToAttack()
 {
-    is_charging_ = true;
+    isCharging_ = true;
     fusion_ = 1;
 }
 
@@ -21,7 +21,7 @@ void Unit::onFusion(Unit* fusionUnit) {
 
 bool Unit::updateCharge()
 {
-    if (!is_charging_)
+    if (!isCharging_)
     {
         return false;
     }
@@ -39,7 +39,7 @@ bool Unit::updateCharge()
 
 int Unit::attack(BattleField &opponentBattlefield, int attackedColumn)
 {
-    if (!is_charging_)
+    if (!isCharging_)
     {
         return 0;
     }
@@ -63,7 +63,7 @@ int Unit::attack(BattleField &opponentBattlefield, int attackedColumn)
 
 int ChampionUnit::attack(BattleField &opponentBattlefield, int attackedColumn)
 {
-    if (!is_charging_)
+    if (!isCharging_)
     {
         return 0;
     }
@@ -93,7 +93,7 @@ int ChampionUnit::attack(BattleField &opponentBattlefield, int attackedColumn)
 
 void Unit::heal()
 {
-    if (is_charging_)
+    if (isCharging_)
     {
         float maxCurrentHealth = fusion_ * (power_ - toughness_) * (1 - remainingChargeTurns_ / charge_);
         float heal = fusion_ * (power_ - toughness_) / charge_;

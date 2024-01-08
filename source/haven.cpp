@@ -4,7 +4,7 @@
 #include "utils.hpp"
 
 int haven::Spearman::attack(BattleField& opponentBattlefield, int attackedColumn) {
-    if (!is_charging_) {
+    if (!isCharging_) {
         return 0;
     }
 

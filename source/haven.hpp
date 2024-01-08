@@ -6,23 +6,23 @@ namespace haven {
 
 class Swordsman : public CoreUnit {
 public:
-    Swordsman(Player* currentPlayer, ColorType colorType) : CoreUnit(3, 11, 3, currentPlayer, UnitType::Swordsman, colorType, 2) { };
+    Swordsman(Player* currentPlayer, ColorType colorType) : CoreUnit(3, 11, 3, currentPlayer, UnitType::Swordsman, colorType, 3) { };
 };
 
 class Archer : public CoreUnit {
 public:
-    Archer(Player* currentPlayer, ColorType colorType) : CoreUnit(2, 8, 3, currentPlayer, UnitType::Archer, colorType, 8) { };
+    Archer(Player* currentPlayer, ColorType colorType) : CoreUnit(2, 8, 3, currentPlayer, UnitType::Archer, colorType, 9) { };
 };
 
 class Spearman : public CoreUnit {
 public:
-    Spearman(Player* currentPlayer, ColorType colorType) : CoreUnit(3, 9, 2, currentPlayer, UnitType::Spearman, colorType, 5) { };
+    Spearman(Player* currentPlayer, ColorType colorType) : CoreUnit(3, 9, 2, currentPlayer, UnitType::Spearman, colorType, 6) { };
     int attack(BattleField& opponentBattlefield, int attackedColumn);
 };
 
 class Knight : public EliteUnit {
 public:
-    Knight(Player* currentPlayer, ColorType colorType) : EliteUnit(4, 30, 6, currentPlayer, UnitType::Knight, colorType, 11) { };
+    Knight(Player* currentPlayer, ColorType colorType) : EliteUnit(4, 30, 6, currentPlayer, UnitType::Knight, colorType, 12) { };
     void onTransformToAttack();
     bool updateCharge();
 };
