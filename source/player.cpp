@@ -136,14 +136,21 @@ void Player::render() {
                     ++relativePosition.y;
                 }
                 relativePosition.y--;
+                if (!sub_) { relativePosition.y = unit->getSize().y - 1 - relativePosition.y; }
 
                 bool isSelected = at(selectedUnit_.x, selectedUnit_.y) == at(x, y);
+
+                Vector position = { x * 28 + 16, y * 28 };
+                if (!sub_) {
+                    position.y = -position.y + 192;
+                }
+                if (isSelected) { position.y += 5; }
 
                 auto spriteId = unit->getSpriteIdAt(relativePosition);
                 oamSet(
                     oam(),
                     x + y * 8,
-                    x * 28 + 16, y * 28 + (sub_ ? 0 : 20) + (isSelected ? 5 : 0),
+                    position.x, position.y,
                     isSelected ? 0 : 1,
                     0,
                     SpriteSize_32x32,
@@ -179,11 +186,16 @@ void Player::render() {
         }
     }
 
+
+    Vector position = { selectedUnit_.x * 28 + 16, selectedUnit_.y * 28 };
+    if (!sub_) {
+        position.y = -position.y + 192;
+    }
     if (hasSelectedUnit() && at(selectedUnit_.x, selectedUnit_.y) == nullptr) {
         oamSet(
             oam(),
             127,
-            selectedUnit_.x * 28 + 16, selectedUnit_.y * 28 + (sub_ ? 0 : 20),
+            position.x, position.y,
             0,
             0,
             SpriteSize_32x32,
@@ -224,20 +236,31 @@ void Player::render() {
 bool Player::handleInputs() {
     auto keys = keysDown();
     if (!hasSelectedUnit() && (keys & (KEY_UP | KEY_DOWN | KEY_RIGHT | KEY_LEFT))) {
-        selectedUnit_.x = 0;
-        selectedUnit_.y = 0;
+        if (sub_) {
+            selectedUnit_ = { 0,0 };
+        } else {
+            selectedUnit_ = { 0, 5 };
+        }
     } else {
         if (keys & KEY_UP) {
-            selectedUnit_.y = selectedUnit_.y - 1;
+            if (sub_) {
+                selectedUnit_.y--;
+            } else {
+                selectedUnit_.y++;
+            }
         }
         if (keys & KEY_DOWN) {
-            selectedUnit_.y = selectedUnit_.y + 1;
+            if (sub_) {
+                selectedUnit_.y++;
+            } else {
+                selectedUnit_.y--;
+            }
         }
         if (keys & KEY_LEFT) {
-            selectedUnit_.x = selectedUnit_.x - 1;
+            selectedUnit_.x--;
         }
         if (keys & KEY_RIGHT) {
-            selectedUnit_.x = selectedUnit_.x + 1;
+            selectedUnit_.x++;
         }
     }
 

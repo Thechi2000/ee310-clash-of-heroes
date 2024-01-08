@@ -11,7 +11,7 @@ public:
 
 class Archer : public CoreUnit {
 public:
-    Archer(Player* currentPlayer, ColorType colorType) : CoreUnit(2, 8, 3, currentPlayer, UnitType::Archer, colorType, 9) { };
+    Archer(Player* currentPlayer, ColorType colorType) : CoreUnit(2, 8, 3, currentPlayer, UnitType::HavenArcher, colorType, 9) { };
 };
 
 class Spearman : public CoreUnit {
@@ -35,6 +35,6 @@ public:
 
 class HavenWall : public Wall {
 public:
-    HavenWall(Player* currentPlayer) : Wall(8, currentPlayer, UnitType::Haven_Wall, 1) { };
+    HavenWall(Player* currentPlayer) : Wall(8, currentPlayer, UnitType::HavenWall, 1) { };
 };
 }

@@ -5,6 +5,7 @@
 #include "havenUnits.h"
 
 #include "haven.hpp"
+#include "sylvan.hpp"
 
 class SylvanCharacter : public Character {
 public:
@@ -18,7 +19,19 @@ public:
     ) { }
 
     virtual Unit* randomUnitFactory(Player* player) const {
-        return nullptr;
+        int r = rand() % 12;
+
+        if (IN_RANGE(r, 0, 3)) {
+            return new sylvan::Bear(player, ColorType::ColorA);
+        } else if (IN_RANGE(r, 3, 6)) {
+            return new sylvan::Archer(player, ColorType::ColorB);
+        } else if (IN_RANGE(r, 6, 9)) {
+            return new sylvan::Nymph(player, ColorType::ColorC);
+        } else if (IN_RANGE(r, 9, 11)) {
+            return new sylvan::Deer(player, static_cast<ColorType>(rand() % 3));
+        } else {
+            return new sylvan::Drake(player, static_cast<ColorType>(rand() % 3));
+        }
     }
 };
 

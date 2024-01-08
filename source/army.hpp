@@ -13,23 +13,30 @@ enum Faction : unsigned int {
 };
 
 enum UnitType {
-    None,
+    None = 0,
 
-    Haven_Start,
     // Haven
     Swordsman,
-    Archer,
+    HavenArcher,
     Spearman,
 
     // Haven special
     Knight,
     Angel,
-    Haven_Wall,
-    Haven_End,
+    HavenWall,
+
+    // Sylvan
+    Bear,
+    SylvanArcher,
+    Nymph,
+
+    // Sylvan special
+    Deer,
+    Drake,
+    SylvanWall,
 };
 
-struct Army
-{
+struct Army {
     UnitType soldierA;
     UnitType soldierB;
     UnitType soldierC;
