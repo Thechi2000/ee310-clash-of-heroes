@@ -137,7 +137,7 @@ void Player::render() {
                 }
                 relativePosition.y--;
 
-                bool isSelected = selectedUnit_.x == x && selectedUnit_.y == y;
+                bool isSelected = at(selectedUnit_.x, selectedUnit_.y) == at(x, y);
 
                 auto spriteId = unit->getSpriteIdAt(relativePosition);
                 oamSet(
