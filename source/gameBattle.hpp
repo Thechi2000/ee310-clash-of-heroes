@@ -2,6 +2,9 @@
 #include "game.hpp"
 #include "player.hpp"
 
+/**
+ * Battle phase
+*/
 class GameBattle : public GameState {
 public:
     GameBattle(Faction firstPlayer, Faction secondPlayer);

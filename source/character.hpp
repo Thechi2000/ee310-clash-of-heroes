@@ -2,12 +2,25 @@
 #include "units.hpp"
 #include "army.hpp"
 
+/**
+ * A playable character from the game. Each character has its own special ability and is linked to a faction
+*/
 class Character {
+    /**
+     * Special ability of a character that can be activated during its turn
+    */
     class CharacterAbility {
     public:
         CharacterAbility(Sprite notCharged, Sprite fullyCharged) : notCharged_(notCharged), fullyCharged_(fullyCharged), currentCharge_(100) { }
 
+        /**
+         * Actions to do when used
+        */
         virtual void use();
+
+        /**
+         * A special ability is charged when dealing damages or taking ones. It can also be stolen by certain units
+        */
         virtual void addCharge(int addedCharge);
         virtual void subtractCharge(int subtractedCharge);
 
@@ -18,6 +31,10 @@ class Character {
     };
 
 public:
+
+    /**
+     * Create the default character assigned to this faction
+    */
     static Character* fromFaction(Faction faction);
 
     int maxHealth() const { return maxHealth_; }

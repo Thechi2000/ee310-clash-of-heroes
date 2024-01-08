@@ -1,5 +1,8 @@
 #pragma once
 
+/**
+ * Color of a unit. Units a same color can be aligned to create walls or charge units
+*/
 enum ColorType {
     ColorA,
     ColorB,
@@ -7,11 +10,17 @@ enum ColorType {
     WallColor,
 };
 
+/**
+ * Factions implemented in the game
+*/
 enum Faction : unsigned int {
     Haven,
     Sylvan,
 };
 
+/**
+ * All units from the game
+*/
 enum UnitType {
     None = 0,
 
@@ -36,6 +45,9 @@ enum UnitType {
     SylvanWall,
 };
 
+/**
+ * Army of a player. Each army contains 1 wall type, 3 core units and 2 special units
+*/
 struct Army {
     UnitType soldierA;
     UnitType soldierB;

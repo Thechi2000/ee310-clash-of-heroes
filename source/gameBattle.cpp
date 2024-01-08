@@ -56,6 +56,7 @@ GameState* GameBattle::handle_inputs() {
         if (currentPlayer().actionDone()) {
             playerAPlaying_ = !playerAPlaying_;
             (playerAPlaying_) ? playerA_.startTurn() : playerB_.startTurn();
+            
         }
     }
 

@@ -30,6 +30,10 @@ public:
      * Process the removal of a unit at the given position
     */
     void handleDisparition(int battlefieldPosition);
+
+    /**
+     * Updates the whole battlefield (create walls, handle aligned units, move units)
+    */
     void updateBattleField();
 
     /**
@@ -41,7 +45,7 @@ public:
     /**
      * Handle the number action per turn
     */
-   void startTurn() { remainingMoves_ = 3; };
+   void startTurn();
    bool actionDone() { --remainingMoves_; return remainingMoves_ <= 0; }
 
     /**

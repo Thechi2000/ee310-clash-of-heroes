@@ -613,3 +613,19 @@ Vector Player::computeOnScreenCoordinates(const Vector& coord, bool selectedOffs
     if (selectedOffset) { position.y += 5; }
     return position;
 }
+
+void Player::startTurn() {
+    remainingMoves_ = 3;
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 6; ++y) {
+            Unit* u = battleField_[8 * x + y];
+            if (u != nullptr) {
+                if(u->updateCharge()) {
+                    u->attack(getEnnemyBattlefield(), x);
+                    handleDisparition(8 * x + y);
+                }
+            }
+        }
+    }
+    updateBattleField();
+}
