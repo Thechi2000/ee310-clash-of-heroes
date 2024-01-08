@@ -2,44 +2,39 @@
 #include "units.hpp"
 #include "army.hpp"
 
-// TODO : Assign the right sprite id
+namespace haven {
 
-class Swordsman : public CoreUnit
-{
+class Swordsman : public CoreUnit {
 public:
-    Swordsman(Player* currentPlayer, ColorType colorType) : CoreUnit(3, 11, 3, currentPlayer, UnitType::Swordsman, colorType, 0) {};
+    Swordsman(Player* currentPlayer, ColorType colorType) : CoreUnit(3, 11, 3, currentPlayer, UnitType::Swordsman, colorType, 2) { };
 };
 
-class Archer : public CoreUnit
-{
+class Archer : public CoreUnit {
 public:
-    Archer(Player* currentPlayer, ColorType colorType) : CoreUnit(2, 8, 3, currentPlayer, UnitType::Archer, colorType, 0){};
+    Archer(Player* currentPlayer, ColorType colorType) : CoreUnit(2, 8, 3, currentPlayer, UnitType::Archer, colorType, 8) { };
 };
 
-class Spearman : public CoreUnit
-{
+class Spearman : public CoreUnit {
 public:
-    Spearman(Player* currentPlayer, ColorType colorType) : CoreUnit(3, 9, 2, currentPlayer, UnitType::Spearman, colorType, 0){};
-    int attack(BattleField &opponentBattlefield, int attackedColumn);
+    Spearman(Player* currentPlayer, ColorType colorType) : CoreUnit(3, 9, 2, currentPlayer, UnitType::Spearman, colorType, 5) { };
+    int attack(BattleField& opponentBattlefield, int attackedColumn);
 };
 
-class Knight : public EliteUnit
-{
+class Knight : public EliteUnit {
 public:
-    Knight(Player* currentPlayer, ColorType colorType) : EliteUnit(4, 30, 6, currentPlayer, UnitType::Knight, colorType, 0){};
+    Knight(Player* currentPlayer, ColorType colorType) : EliteUnit(4, 30, 6, currentPlayer, UnitType::Knight, colorType, 11) { };
     void onTransformToAttack();
     bool updateCharge();
 };
 
-class Angel : public ChampionUnit
-{
+class Angel : public ChampionUnit {
 public:
-    Angel(Player* currentPlayer, ColorType colorType) : ChampionUnit(6, 115, 23, currentPlayer, UnitType::Angel, colorType, 0){};
+    Angel(Player* currentPlayer, ColorType colorType) : ChampionUnit(6, 115, 23, currentPlayer, UnitType::Angel, colorType, 24) { };
     bool updateCharge();
 };
 
-class HavenWall : public Wall
-{
+class HavenWall : public Wall {
 public:
-    HavenWall(Player* currentPlayer) : Wall(8, currentPlayer, UnitType::Haven_Wall, 0){};
+    HavenWall(Player* currentPlayer) : Wall(8, currentPlayer, UnitType::Haven_Wall, 1) { };
 };
+}

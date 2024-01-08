@@ -28,6 +28,12 @@ public:
     void handleDisparition(int battlefieldPosition);
     void updateBattleField();
 
+    /**
+     * Puts a unit at the given location.
+     * Returns whether the operation was successfull
+    */
+    bool putUnit(Unit* unit, const Vector& position);
+
     Unit *&at(int x, int y);
 
     void init();
