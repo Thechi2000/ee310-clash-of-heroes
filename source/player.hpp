@@ -39,6 +39,12 @@ public:
     bool putUnit(Unit* unit, const Vector& position);
 
     /**
+     * Handle the number action per turn
+    */
+   void startTurn() { remainingMoves_ = 3; };
+   bool actionDone() { --remainingMoves_; return remainingMoves_ <= 0; }
+
+    /**
      * Returns a reference for the Unit at the given position
     */
     Unit*& at(int x, int y);
@@ -68,6 +74,7 @@ private:
 
     int currentHealth_;
     int invocableUnits_;
+    int remainingMoves_;
 
     Vector selectedUnit_;
     uint32_t keyAPressedAt_;

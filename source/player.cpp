@@ -583,6 +583,9 @@ bool Player::putUnit(Unit* unit, const Vector& position) {
         }
     }
 
+    remainingMoves_ -= 1;
+    updateBattleField();
+
     return true;
 }
 

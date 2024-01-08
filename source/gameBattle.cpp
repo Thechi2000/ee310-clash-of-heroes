@@ -53,7 +53,10 @@ void GameBattle::render() {
 GameState* GameBattle::handle_inputs() {
     // Make the current player handle the inputs, and switch the turn to the other player if he as finished
     if (currentPlayer().handleInputs()) {
-        playerAPlaying_ = !playerAPlaying_;
+        if (currentPlayer().actionDone()) {
+            playerAPlaying_ = !playerAPlaying_;
+            (playerAPlaying_) ? playerA_.startTurn() : playerB_.startTurn();
+        }
     }
 
     return nullptr;
