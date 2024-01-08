@@ -1,6 +1,7 @@
 #pragma once
-enum Faction {
+enum Faction : unsigned int {
     Haven,
+    Sylvan,
 };
 
 enum UnitType {

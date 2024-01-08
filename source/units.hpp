@@ -22,7 +22,7 @@ class Unit
 {
 public:
     virtual int disappear(); // return damage dealt
-    virtual void onTransformToWall(){};
+    virtual void onTransformToWall(){}
     virtual void onTransformToAttack();
     const Vector &getSize() const { return size_; }
     virtual bool getIsCharging() const { return is_charging_; }

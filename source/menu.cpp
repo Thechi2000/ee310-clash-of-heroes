@@ -2,11 +2,11 @@
 #include "abilities_menu_background.h"
 #include "portraits.h"
 #include "portraitsBackground.h"
+#include "gameBattle.hpp"
 #include <maxmod9.h>
 #include "soundbank.h"
 
 struct CharacterDisplay {
-    Sprite sprite;
     const char* name;
     const char* spell_name;
     const char* spell_description;
@@ -15,6 +15,7 @@ struct CharacterDisplay {
     const char* wall_description;
     const char* wall_sprite;
     int x, y;
+    Faction faction;
 };
 
 const CharacterDisplay characters[] = { CharacterDisplay {
@@ -25,6 +26,7 @@ const CharacterDisplay characters[] = { CharacterDisplay {
         .wall_description = "wall test test test",
         .x = 0,
         .y = 0,
+        .faction = Faction::Sylvan,
     },
     CharacterDisplay {
         .name = "test2",
@@ -34,6 +36,7 @@ const CharacterDisplay characters[] = { CharacterDisplay {
         .wall_description = "wall test test test",
         .x = 0,
         .y = 0,
+        .faction = Faction::Sylvan,
     },
     CharacterDisplay {
         .name = "test3",
@@ -43,6 +46,7 @@ const CharacterDisplay characters[] = { CharacterDisplay {
         .wall_description = "wall test test test",
         .x = 0,
         .y = 0,
+        .faction = Faction::Sylvan,
     },
     CharacterDisplay {
         .name = "test4",
@@ -52,6 +56,7 @@ const CharacterDisplay characters[] = { CharacterDisplay {
         .wall_description = "wall test test test",
         .x = 0,
         .y = 0,
+        .faction = Faction::Sylvan,
     }
 };
 const size_t character_count = sizeof(characters) / sizeof(CharacterDisplay);
@@ -71,7 +76,10 @@ void drawCharacter(int id, int x, int y) {
     }
 }
 
-CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displayed_character(-1) {
+CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displayed_character(-1) { }
+CharacterSelectionMenu::~CharacterSelectionMenu() { }
+
+void CharacterSelectionMenu::init() {
     VRAM_A_CR = VRAM_ENABLE | VRAM_A_MAIN_BG;
     REG_DISPCNT = MODE_3_2D | DISPLAY_BG3_ACTIVE;
     BGCTRL[3] = BG_BMP_BASE(1) | BG_BMP8_256x256;
@@ -112,6 +120,23 @@ CharacterSelectionMenu::CharacterSelectionMenu() : selected_character(0), displa
     mmStart(MOD_MENU, MM_PLAY_LOOP);
     mmSetModuleVolume(256);
 }
+void CharacterSelectionMenu::deinit() {
+    VRAM_A_CR = 0;
+    REG_DISPCNT = 0;
+    BGCTRL[2] = 0;
+    BGCTRL[3] = 0;
+
+    VRAM_C_CR = 0;
+    REG_DISPCNT_SUB = 0;
+    BGCTRL_SUB[0] = 0;
+    BGCTRL_SUB[1] = 0;
+    BGCTRL_SUB[2] = 0;
+    BGCTRL_SUB[3] = 0;
+
+    mmUnload(MOD_MENU);
+    mmUnloadEffect(SFX_MENU_SELECT);
+    mmUnloadEffect(SFX_MENU_SWAP);
+}
 
 void CharacterSelectionMenu::render() {
     if (displayed_character != selected_character) {
@@ -133,6 +158,7 @@ void CharacterSelectionMenu::render() {
 
         consoleSelect(&sub_printer);
         printf("\x1B[32m\033[19;12H%s", character->name);
+        printf("\x1B[32m\033[0;12HPlayer %s", firstPlayerFaction_.has_value() ? "2" : "1");
 
         displayed_character = selected_character;
     }
@@ -150,6 +176,16 @@ GameState* CharacterSelectionMenu::handle_inputs() {
     } else if (keys & KEY_A) {
         mmEffect(SFX_MENU_SELECT);
         return confirmSelection();
+    } else if (keys & KEY_B) {
+        if (secondPlayerFaction_.has_value()) {
+            secondPlayerFaction_ = {};
+            displayed_character = -1;
+            selected_character = 0;
+        } else if (firstPlayerFaction_.has_value()) {
+            firstPlayerFaction_ = {};
+            displayed_character = -1;
+            selected_character = 0;
+        }
     }
 
     if (keys & KEY_TOUCH) {
@@ -173,23 +209,10 @@ GameState* CharacterSelectionMenu::handle_inputs() {
 }
 
 GameState* CharacterSelectionMenu::confirmSelection() {
-    return nullptr;
-}
+    (firstPlayerFaction_.has_value() ? secondPlayerFaction_ : firstPlayerFaction_) = characters[selected_character].faction;
 
-CharacterSelectionMenu::~CharacterSelectionMenu() {
-    VRAM_A_CR = 0;
-    REG_DISPCNT = 0;
-    BGCTRL[2] = 0;
-    BGCTRL[3] = 0;
+    displayed_character = -1;
+    selected_character = 0;
 
-    VRAM_C_CR = 0;
-    REG_DISPCNT_SUB = 0;
-    BGCTRL_SUB[0] = 0;
-    BGCTRL_SUB[1] = 0;
-    BGCTRL_SUB[2] = 0;
-    BGCTRL_SUB[3] = 0;
-
-    mmUnload(MOD_MENU);
-    mmUnloadEffect(SFX_MENU_SELECT);
-    mmUnloadEffect(SFX_MENU_SWAP);
+    return (firstPlayerFaction_.has_value() && secondPlayerFaction_.has_value()) ? new GameBattle(firstPlayerFaction_.value(), secondPlayerFaction_.value()) : nullptr;
 }
