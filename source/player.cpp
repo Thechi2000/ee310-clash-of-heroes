@@ -22,7 +22,9 @@ Player::Player(Faction faction) : character_(Character::fromFaction(faction)), s
     isMe = true;
 
     for (int i = 0; i < 48; ++i) {
-        battleField_->units[i] = new TestUnit(1, 1, this, i % 9 + 1);
+        if (rand() % 3 == 0) {
+            battleField_->units[i] = new TestUnit(1, 1, this, i % 9 + 1);
+        }
     }
     // END REMOVE
 }
@@ -147,9 +149,32 @@ void Player::render() {
                     false,
                     false,
                     false, false,
-                    false);
+                    false
+                );
+            } else {
+                oamSetHidden(oam(), x + y * 8, true);
             }
         }
+    }
+
+    if (hasSelectedUnit() && at(selectedUnit_.x, selectedUnit_.y) == nullptr) {
+        oamSet(
+            oam(),
+            49,
+            selectedUnit_.x * 28 + 16, selectedUnit_.y * 28 + (me_ ? 0 : 20),
+            0,
+            0,
+            SpriteSize_32x32,
+            SpriteColorFormat_256Color,
+            spritesGfx_[0],
+            -1,
+            false,
+            false,
+            false, false,
+            false
+        );
+    } else {
+        oamSetHidden(oam(), 49, true);
     }
 
     oamUpdate(oam());
