@@ -10,13 +10,17 @@ void handleDisparition(int battlefieldPosition, BattleField &battleField) {
         return;
     }
     if (uT < SubUnits) {
-        for (int i = battleField.units[battlefieldPosition]->getSize().y - 1; i >= 0; i--) {
-            for (int j = battleField.units[battlefieldPosition]->getSize().x - 1; j >= 0; j--) {
+        int x = battleField.units[battlefieldPosition]->getSize().x;
+        int y = battleField.units[battlefieldPosition]->getSize().y;
+        delete battleField.units[battlefieldPosition];
+        for (int i = 0; i < y; i--) {
+            for (int j = 0; j < x; j--) {
                 battleField.unitTypes[battlefieldPosition + i + 8*j] = None;
-                delete battleField.units[battlefieldPosition + i + 8*j];
+                
                 battleField.units[battlefieldPosition + i + 8*j] = nullptr;
             }
         }
+        
         return;
     }
     if (uT == CoreCharging_F) {
