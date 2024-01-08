@@ -13,13 +13,11 @@ public:
     bool updateCharge() { }
 };
 
-Player::Player(Faction faction) : character_(Character::fromFaction(faction)), selectedUnit_{ -1, -1 } {
+Player::Player(Faction faction, bool sub) :
+    character_(Character::fromFaction(faction)),
+    selectedUnit_{ -1, -1 },
+    sub_(sub) {
     battleField_->units.fill(nullptr);
-
-    // TODO REMOVE
-    static bool isMe = false;
-    me_ = isMe;
-    isMe = true;
 
     for (int i = 0; i < 48; ++i) {
         if (rand() % 3 == 0) {
@@ -30,11 +28,11 @@ Player::Player(Faction faction) : character_(Character::fromFaction(faction)), s
 }
 
 void Player::init() {
-    consoleInit(&console_, 0, BgType_Text4bpp, BgSize_T_256x256, 8, 0, !me_, true);
+    consoleInit(&console_, 0, BgType_Text4bpp, BgSize_T_256x256, 8, 0, !sub_, true);
 
-    if (me_) {
+    if (sub_) {
         VRAM_C_CR = VRAM_ENABLE | VRAM_C_SUB_BG;
-        REG_DISPCNT_SUB = 0;
+        REG_DISPCNT_SUB = 0; // Disable the display to avoid clutter on the screen while loading the different assets
         BGCTRL_SUB[2] = BG_BMP_BASE(4) | BgSize_B8_256x256;
 
         mdCopy(BG_BMP_RAM_SUB(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8* array) {
@@ -55,7 +53,7 @@ void Player::init() {
         swiCopy(character_->spritePal, SPRITE_PALETTE_SUB, character_->spritePalLen / 2);
     } else {
         VRAM_A_CR = VRAM_ENABLE | VRAM_A_MAIN_BG;
-        REG_DISPCNT = 0;
+        REG_DISPCNT = 0; // Disable the display to avoid clutter on the screen while loading the different assets
         BGCTRL[2] = BG_BMP_BASE(4) | BgSize_B8_256x256;
 
         mdCopy(BG_BMP_RAM(4), character_->bgBmp, character_->bgBmpLen, [](u8 a, size_t i, u8* array) {
@@ -112,7 +110,7 @@ Unit*& Player::at(int x, int y) {
 }
 
 OamState* Player::oam() const {
-    return me_ ? &oamSub : &oamMain;
+    return sub_ ? &oamSub : &oamMain;
 }
 
 bool Player::hasSelectedUnit() const { return selectedUnit_.x != -1 && selectedUnit_.y != -1; }
@@ -139,7 +137,7 @@ void Player::render() {
                 oamSet(
                     oam(),
                     x + y * 8,
-                    x * 28 + 16, y * 28 + (me_ ? 0 : 20) + (isSelected ? 5 : 0),
+                    x * 28 + 16, y * 28 + (sub_ ? 0 : 20) + (isSelected ? 5 : 0),
                     0,
                     0,
                     SpriteSize_32x32,
@@ -161,7 +159,7 @@ void Player::render() {
         oamSet(
             oam(),
             49,
-            selectedUnit_.x * 28 + 16, selectedUnit_.y * 28 + (me_ ? 0 : 20),
+            selectedUnit_.x * 28 + 16, selectedUnit_.y * 28 + (sub_ ? 0 : 20),
             0,
             0,
             SpriteSize_32x32,
@@ -183,20 +181,19 @@ void Player::render() {
 
     consoleSelect(&console_);
     consoleClear();
-    console_.cursorX = (me_ ? 1 : 25);
-    console_.cursorY = (me_ ? 22 : 1);
+    console_.cursorX = (sub_ ? 1 : 25);
+    console_.cursorY = (sub_ ? 22 : 1);
     printf("%0.2ld:%0.2ld", time.minutes, time.seconds);
 
-    if (me_) {
+    // Enable the display after the first render
+    if (sub_) {
         REG_DISPCNT_SUB |= MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG2_ACTIVE;
     } else {
         REG_DISPCNT |= MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG2_ACTIVE;
     }
 }
 
-void Player::handleInputs() {
-    if (!me_) { return; }
-
+bool Player::handleInputs() {
     auto keys = keysDown();
     if (!hasSelectedUnit() && (keys & (KEY_UP | KEY_DOWN | KEY_RIGHT | KEY_LEFT))) {
         selectedUnit_.x = 0;
@@ -213,44 +210,41 @@ void Player::handleInputs() {
         selectedUnit_.y = -1;
     }
 
-    if (hasSelectedUnit()) {
-        if (keys & (KEY_A | KEY_TOUCH)) {
-            if (keys & KEY_A) {
-                keyAPressedAt_ = timeAsMilliseconds();
-            }
+    if ((keys & KEY_A) || (sub_ && (keys & KEY_TOUCH))) {
+        if ((keys & KEY_A)) {
+            keyAPressedAt_ = timeAsMilliseconds();
+        }
 
 
-            if (keys & KEY_TOUCH) {
-                touchPosition pos = touchReadXY();
+        if (sub_ && (keys & KEY_TOUCH)) {
+            touchPosition pos = touchReadXY();
 
-                if (IN_RANGE(pos.px, 16, 240) && IN_RANGE(pos.py, 0, 168)) {
-                    int x = (pos.px - 16) / 32;
-                    int y = pos.py / 32;
+            if (IN_RANGE(pos.px, 16, 240) && IN_RANGE(pos.py, 0, 168)) {
+                int x = (pos.px - 16) / 32;
+                int y = pos.py / 32;
 
-                    if (selectedUnit_.x != x || selectedUnit_.y != y) {
-                        touchScreenPressedAt_ = timeAsMilliseconds();
-                    }
-
-                    selectedUnit_.x = x;
-                    selectedUnit_.y = y;
+                if (selectedUnit_.x != x || selectedUnit_.y != y) {
+                    touchScreenPressedAt_ = timeAsMilliseconds();
                 }
-            }
-        } else {
-            uint64_t heldTime = 0;
-            if (keyAPressedAt_ && !(keysHeld() & KEY_A)) {
-                heldTime = timeAsMilliseconds() - keyAPressedAt_;
-                keyAPressedAt_ = 0;
-            }
-            if (touchScreenPressedAt_ && !(keysHeld() & KEY_TOUCH)) {
-                heldTime = timeAsMilliseconds() - touchScreenPressedAt_;
-                touchScreenPressedAt_ = 0;
-            }
 
-            if (heldTime > 2000) {
-                TO_BE_IMPLEMENTED();
-            } else if (heldTime > 0) {
-                TO_BE_IMPLEMENTED();
+                selectedUnit_.x = x;
+                selectedUnit_.y = y;
             }
+        }
+    } else {
+        uint64_t heldTime = 0;
+        if (keyAPressedAt_ && !(keysHeld() & KEY_A)) {
+            heldTime = timeAsMilliseconds() - keyAPressedAt_;
+            keyAPressedAt_ = 0;
+        }
+        if (touchScreenPressedAt_ && !(keysHeld() & KEY_TOUCH)) {
+            heldTime = timeAsMilliseconds() - touchScreenPressedAt_;
+            touchScreenPressedAt_ = 0;
+        }
+
+        if (heldTime > 0) {
+            selectedUnit_ = { -1, -1 };
+            return true;
         }
     }
 }
