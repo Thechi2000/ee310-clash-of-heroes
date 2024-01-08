@@ -272,7 +272,7 @@ bool Player::handleInputs() {
                 int x = (pos.px - 16) / 32;
                 int y = pos.py / 32;
 
-                if (selectedUnit_.x != x || selectedUnit_.y != y) {
+                if (selectedUnit_.x == x && selectedUnit_.y == y) {
                     touchScreenPressedAt_ = timeAsMilliseconds();
                 }
 
@@ -296,6 +296,8 @@ bool Player::handleInputs() {
             return true;
         }
     }
+
+    return false;
 }
 
 bool Player::putUnit(Unit* unit, const Vector& position) {
