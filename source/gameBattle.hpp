@@ -2,12 +2,8 @@
 #include "game.hpp"
 #include "player.hpp"
 
-class Player;
-enum Faction : unsigned int;
-
 class GameBattle : public GameState {
 public:
-    GameBattle() {}
     GameBattle(Faction firstPlayer, Faction secondPlayer);
     ~GameBattle();
 
@@ -18,7 +14,6 @@ public:
     virtual void deinit();
 
 private:
-    Player* playerA_;
-    Player* playerB_;
-
+    Player playerA_;
+    Player playerB_;
 };

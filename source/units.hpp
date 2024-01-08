@@ -1,6 +1,5 @@
 #pragma once
 #include "game.hpp"
-#include "gameBattle.hpp"
 #include "army.hpp"
 #include <array>
 

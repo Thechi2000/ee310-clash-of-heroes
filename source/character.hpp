@@ -1,5 +1,4 @@
 #pragma once
-#include "game.hpp"
 #include "units.hpp"
 #include "army.hpp"
 

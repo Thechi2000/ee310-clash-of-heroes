@@ -22,7 +22,7 @@ Player::Player(Faction faction) : character_(Character::fromFaction(faction)), s
     isMe = true;
 
     for (int i = 0; i < 48; ++i) {
-        battleField_->units[i] = new TestUnit(1, 1, this, i % 9);
+        battleField_->units[i] = new TestUnit(1, 1, this, i % 9 + 1);
     }
     // END REMOVE
 }

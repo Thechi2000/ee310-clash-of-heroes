@@ -7,7 +7,6 @@
 
 struct BattleField;
 class Unit;
-class Character;
 
 class Player {
 public:
@@ -20,7 +19,7 @@ public:
     void handleInputs();
 
     BattleField* getAllyBattlefield() { return battleField_; }
-    BattleField* getEnnemiBattlefield() { return opponent_->getAllyBattlefield(); }
+    BattleField* getEnnemyBattlefield() { return opponent_->getAllyBattlefield(); }
 
     Unit*& at(int x, int y);
 

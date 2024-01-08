@@ -1,5 +1,6 @@
-#include "haven.hpp"
 #include <cmath>
+#include "player.hpp"
+#include "haven.hpp"
 #include "utils.hpp"
 
 int Spearman::attack(BattleField &opponentBattlefield, int attackedColumn)

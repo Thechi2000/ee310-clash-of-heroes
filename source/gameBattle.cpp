@@ -2,13 +2,8 @@
 #include "soundbank.h"
 #include <maxmod9.h>
 
-GameBattle::GameBattle(Faction firstPlayer, Faction secondPlayer) : playerA_(nullptr), playerB_(nullptr)
+GameBattle::GameBattle(Faction firstPlayer, Faction secondPlayer) : playerA_(firstPlayer), playerB_(secondPlayer)
 {
-    Player pA = Player(firstPlayer);
-    Player pB = Player(secondPlayer);
-
-    playerA_ = &pA;
-    playerB_ = &pB;
 }
 GameBattle::~GameBattle() {}
 
@@ -27,8 +22,8 @@ void GameBattle::init()
 
     mmStart(MOD_BATTLE, MM_PLAY_LOOP);
 
-    playerA_->init();
-    playerB_->init();
+    playerA_.init();
+    playerB_.init();
 }
 void GameBattle::deinit()
 {
@@ -44,14 +39,14 @@ void GameBattle::deinit()
 
 void GameBattle::render()
 {
-    playerA_->render();
-    playerB_->render();
+    playerA_.render();
+    playerB_.render();
 }
 
 GameState *GameBattle::handle_inputs()
 {
-    playerA_->handleInputs();
-    playerB_->handleInputs();
+    playerA_.handleInputs();
+    playerB_.handleInputs();
 
     return nullptr;
 }
